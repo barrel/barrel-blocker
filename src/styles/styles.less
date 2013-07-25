@@ -1,0 +1,101 @@
+@import "mixins.less";
+
+@perspective: 1500px;
+@viewAngle: -30deg;
+
+@grid: 100px;
+
+* {
+	.box-sizing(border-box);
+	.no-smoothing;
+}
+
+html, body {
+	height: 100%;
+	margin: 0; padding: 0;
+	overflow: hidden;
+}
+
+body {
+	.perspective(@perspective);
+	.perspective-origin(50%, 0%);
+	.transition(250ms);
+
+	&.fade {
+		&:after {
+			content: "";
+			.fill-container;
+			background: fadeOut(white, 2%);
+		}
+	}
+}
+
+#room {
+	position: absolute;
+	top: 0; left: 50%;
+	width: @grid;
+	height: @grid;
+	margin-left: (@grid * -5);
+	.transform-style(preserve-3d);
+	.transform(translate3d(0, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+
+	&.panning {
+		.animation(camera-pan 3s linear infinite alternate);
+	}
+}
+
+.wall {
+	position: absolute;
+	height: (@grid * 4);
+
+	&.east {
+		.transform-origin(100%, 50%);
+	}
+
+	&.west {
+		.transform-origin(0%, 50%);
+	}
+
+	&.north {
+		.transform-origin(100%, 50%);
+	}
+
+	&.south {
+		.transform-origin(0%, 50%);
+	}
+
+}
+
+.floor {
+	position: absolute;
+	top: (@grid * 4); left: 0;
+	height: 800px;
+	width: 1000px;
+	.transform-origin(50%,0%);
+	.transform(translate3d(0, 0, (@grid * -4)) rotateX(90deg));
+	.transform-style(preserve-3d);
+}
+
+
+.player {
+	position: absolute;
+	top: 0; left: @grid;
+	width: @grid; height: (@grid * 2);
+	background: gray;
+	.transform-origin(50%,100%);
+	.transform(rotateX(-90deg) translateZ(-100px));
+}
+
+@-webkit-keyframes camera-pan { .camera-pan-frames; }
+@-moz-keyframes camera-pan { .camera-pan-frames; }
+@-ms-keyframes camera-pan { .camera-pan-frames; }
+@-o-keyframes camera-pan { .camera-pan-frames; }
+@keyframes camera-pan { .camera-pan-frames; }
+.camera-pan-frames() {
+	from {
+		.transform(translate3d(-200%, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+	}
+	to {
+		.transform(translate3d(300%, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+	}
+}

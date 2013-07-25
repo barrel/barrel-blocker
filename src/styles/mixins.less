@@ -1,0 +1,160 @@
+//
+// LESS Mixins
+// --------------------------------------------------
+
+
+// Utilities
+// --------------------------------------------------
+
+// Force an element to fill its container
+.fill-container() {
+  position: absolute;
+	top: 0; bottom: 0;
+	left: 0; right: 0;
+}
+
+// Center an element using absolute positioning
+.absolute-center(@width, @height) {
+	position: absolute;
+	height: @height; width: @width;
+	top: 50%; left: 50%;
+	margin-top: (@height * -0.5);
+	margin-left: (@width * -0.5);
+}
+
+// Justify for responsive layout
+// http://www.barrelny.com/blog/text-align-justify-and-rwd/
+.just() {
+	text-align: justify;
+	&:after {
+		content: "";
+		display: inline-block;
+		width: 100%;
+	}
+
+	> * {
+		display: inline-block;
+	}
+}
+
+// Force hardware acceleration
+// (Fixes some rendering issues in WebKit)
+.wf() {
+	-webkit-backface-visibility: hidden;
+}
+
+// Disable image smoothing (antialiasing) for crisp, pixel-y goodness
+.no-smoothing {
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
+	-ms-interpolation-mode: nearest-neighbor;
+}
+
+
+// CSS3 Properties
+// --------------------------------------------------
+
+.transform(@transform) {
+	-webkit-transform: @transform;
+	-moz-transform: @transform;
+	-ms-transform: @transform;
+	-o-transform: @transform;
+	transform: @transform;
+}
+
+.transform-origin(@x: 50%, @y: 50%) {
+	-webkit-transform-origin: @x @y;
+	-moz-transform-origin: @x @y;
+	-ms-transform-origin: @x @y;
+	-o-transform-origin: @x @y;
+	transform-origin: @x @y;
+}
+
+.transform-style(@style: preserve-3d) {
+	-webkit-transform-style: @style;
+	-moz-transform-style: @style;
+	-ms-transform-style: @style;
+	-o-transform-style: @style;
+	transform-style: @style;
+}
+
+.perspective(@perspective) {
+	-webkit-perspective: @perspective;
+	-moz-perspective: @perspective;
+	perspective: @perspective;
+}
+
+.perspective-origin(@x: 50%, @y: 50%) {
+	-webkit-perspective-origin: @x @y;
+	-moz-perspective-origin: @x @y;
+	perspective-origin: @x @y;
+}
+
+.backface-visibility(@visibility){
+	-webkit-backface-visibility: @visibility;
+	-moz-backface-visibility: @visibility;
+	backface-visibility: @visibility;
+}
+
+.transition(@transition) {
+	-webkit-transition: @transition;
+	-moz-transition: @transition;
+	-o-transition: @transition;
+	transition: @transition;
+}
+
+.transition-property(@transition-property) {
+	-webkit-transition-property: @transition-property;
+	-moz-transition-property: @transition-property;
+	-o-transition-property: @transition-property;
+	transition-property: @transition-property;
+}
+
+.animation(@animation) {
+	-webkit-animation: @animation;
+	-moz-animation: @animation;
+	animation: @animation;
+}
+
+.animation-play-state(@state) {
+	-webkit-animation-play-state: @state;
+	-moz-animation-play-state: @state;
+	animation-play-state: @state;
+}
+
+.animation-direction(@direction) {
+	-webkit-animation-direction: @direction;
+	-moz-animation-direction: @direction;
+	animation-direction: @direction;
+}
+
+// Keyframes
+// (Duplicate & customize for each animation)
+// 
+// @-webkit-keyframes [ANIMATION NAME] { .[ANIMATION-NAME]-frames; }
+// @-moz-keyframes [ANIMATION NAME] { .[ANIMATION-NAME]-frames; }
+// @-ms-keyframes [ANIMATION NAME] { .[ANIMATION-NAME]-frames; }
+// @-o-keyframes [ANIMATION NAME] { .[ANIMATION-NAME]-frames; }
+// @keyframes [ANIMATION NAME] { .[ANIMATION-NAME]-frames; }
+// .[ANIMATION-NAME]-frames() {
+// 	from {
+// 	}
+// 	to {
+// 	}
+// }
+
+.filter(@filter) {
+	-webkit-filter: @filter;
+	filter: @filter;
+}
+
+// Bootstrap Mixins
+// --------------------------------------------------
+
+.box-sizing(@boxmodel) {
+	-webkit-box-sizing: @boxmodel;
+	-moz-box-sizing: @boxmodel;
+	box-sizing: @boxmodel;
+}
