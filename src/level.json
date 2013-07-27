@@ -1,0 +1,44 @@
+{
+	"level": {
+		"walls": [
+			{
+				"direction": "west",
+				"length": "4",
+				"background": "red"
+			},
+			{
+				"direction": "north",
+				"length": "8",
+				"background": "blue"
+			},
+			{
+				"direction": "east",
+				"length": "4",
+				"background": "yellow"
+			},
+			{
+				"direction": "north",
+				"length": "2",
+				"background": "green"
+			},
+			{
+				"direction": "east",
+				"length": "4",
+				"background": "yellow"
+			},
+			{
+				"direction": "south",
+				"length": "10",
+				"background": "none"
+			},
+			{
+				"direction": "west",
+				"length": "4",
+				"background": "red"
+			}
+		],
+		"floor": {
+			"background": "url(brick.png)"
+		}
+	}
+}

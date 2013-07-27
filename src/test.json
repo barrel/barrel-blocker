@@ -1,0 +1,58 @@
+{
+	"level": {
+		"title": "The Office",
+		"tile": 100,
+		"world": {
+			"width": 20,
+			"length": 20
+		},
+		"startPos": [10,7],
+		"rooms": [
+			{
+				"roomname": "Office",
+				"origin": [5,5],
+				"walls": [
+					{
+						"origin": [0,0],
+						"axis": "y",
+						"length": 8,
+						"background": "rgba(255,255,255,.8)"
+					},
+					{
+						"origin": [0,8],
+						"axis": "x",
+						"length": 8,
+						"background": "rgba(255,255,255,.8)"
+					},
+					{
+						"origin": [8,8],
+						"axis": "y",
+						"length": -4,
+						"background": "rgba(255,255,255,.8)"
+					},
+					{
+						"origin": [8,4],
+						"axis": "x",
+						"length": 2,
+						"background": "rgba(255,255,255,.8)"
+					},
+					{
+						"origin": [10,4],
+						"axis": "y",
+						"length": -4,
+						"background": "rgba(255,255,255,.8)"
+					},
+					{
+						"origin": [10,0],
+						"axis": "x",
+						"length": -10,
+						"background": "rgba(255,255,255,.8)"
+					}
+					
+				]
+		
+			}
+		]
+		
+	}
+}

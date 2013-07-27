@@ -20,6 +20,8 @@ body {
 	.perspective(@perspective);
 	.perspective-origin(50%, 0%);
 	.transition(250ms);
+	
+	background: #000;
 
 	&.fade {
 		&:after {
@@ -30,72 +32,73 @@ body {
 	}
 }
 
-#room {
+#World{
 	position: absolute;
-	top: 0; left: 50%;
-	width: @grid;
-	height: @grid;
-	margin-left: (@grid * -5);
+	left: 50%;
+	top: 50%;
+	background: #333;
+	
 	.transform-style(preserve-3d);
-	.transform(translate3d(0, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+}
 
-	&.panning {
-		.animation(camera-pan 3s linear infinite alternate);
-	}
+.room{
+	position: absolute;
+	
+	.transform-style(preserve-3d);
 }
 
 .wall {
 	position: absolute;
-	height: (@grid * 4);
 
-	&.east {
-		.transform-origin(100%, 50%);
+	.transform-origin(0%, 0%);
+	
+	border: 1px solid #000;
+	
+	&.x-plane{
+		opacity: .5
 	}
-
-	&.west {
-		.transform-origin(0%, 50%);
-	}
-
-	&.north {
-		.transform-origin(100%, 50%);
-	}
-
-	&.south {
-		.transform-origin(0%, 50%);
-	}
-
 }
 
-.floor {
+.char{
 	position: absolute;
-	top: (@grid * 4); left: 0;
-	height: 800px;
-	width: 1000px;
-	.transform-origin(50%,0%);
-	.transform(translate3d(0, 0, (@grid * -4)) rotateX(90deg));
+	background: #000;
+}
+
+.player{
+	left: 50%;
+	top: 50%;
+	margin: -50px 0 0 -50px;
+	
+	.transform(rotateX(-60deg));
 	.transform-style(preserve-3d);
-}
-
-
-.player {
-	position: absolute;
-	top: 0; left: @grid;
-	width: @grid; height: (@grid * 2);
-	background: gray;
-	.transform-origin(50%,100%);
-	.transform(rotateX(-90deg) translateZ(-100px));
-}
-
-@-webkit-keyframes camera-pan { .camera-pan-frames; }
-@-moz-keyframes camera-pan { .camera-pan-frames; }
-@-ms-keyframes camera-pan { .camera-pan-frames; }
-@-o-keyframes camera-pan { .camera-pan-frames; }
-@keyframes camera-pan { .camera-pan-frames; }
-.camera-pan-frames() {
-	from {
-		.transform(translate3d(-200%, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+	
+	.transition(all 200ms);
+	
+	&.down{
+		.transform(rotateX(-60deg) rotateY(180deg));
 	}
-	to {
-		.transform(translate3d(300%, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+	
+	&.left{
+		.transform(rotateX(-60deg) rotateY(90deg));
+	}
+	
+	&.right{
+		.transform(rotateX(-60deg) rotateY(-90deg));
+	}
+	
+	&:after{
+		content: '';
+		display: block;
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 100px;
+		height: 5px;
+		border-radius: 100%;
+		background: rgba(0,0,0,.15);
+		
+		box-shadow: 0 0 30px #000;
+		
+		.transform(rotateX(90deg) translate3d(0, 0px, 0))
 	}
 }

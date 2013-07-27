@@ -17,7 +17,8 @@ module.exports = function(grunt) {
 					'.tmp/styles/*.css',
 					'src/scripts/*.js',
 					'src/images/*.{jpg,png,gif,svg}',
-					'src/*.html'
+					'src/*.html',
+					'src/*.json'
 				],
 				options: {
 					livereload: true
