@@ -36,7 +36,7 @@ body {
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	background: #333;
+	background: transparent;
 	
 	.transform-style(preserve-3d);
 }
@@ -47,7 +47,7 @@ body {
 	.transform-style(preserve-3d);
 }
 
-.wall {
+.wall{
 	position: absolute;
 
 	.transform-origin(0%, 0%);
@@ -59,6 +59,11 @@ body {
 	}
 }
 
+.floortile{
+	position: absolute;
+	background: #fff;
+}
+
 .char{
 	position: absolute;
 	background: #000;
@@ -67,7 +72,7 @@ body {
 .player{
 	left: 50%;
 	top: 50%;
-	margin: -50px 0 0 -50px;
+	.absolute-center(@grid, @grid);
 	
 	.transform(rotateX(-60deg));
 	.transform-style(preserve-3d);
@@ -83,7 +88,7 @@ body {
 	}
 	
 	&.right{
-		.transform(rotateX(-60deg) rotateY(-90deg));
+		.transform(rotateX(-60deg) rotateY(270deg));
 	}
 	
 	&:after{
@@ -92,7 +97,7 @@ body {
 		position: absolute;
 		left: 0;
 		bottom: 0;
-		width: 100px;
+		width: @grid;
 		height: 5px;
 		border-radius: 100%;
 		background: rgba(0,0,0,.15);

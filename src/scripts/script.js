@@ -21,6 +21,7 @@ $.fn.removeStyle=function(a){return this.each(function(){var b=$(this);a=a.repla
 		tile: 100,
 		speed: 8,
 		framerate: 50,
+		viewingAngle: 30,
 		world: {
 			width: null,
 			height: null
@@ -77,7 +78,7 @@ $.fn.removeStyle=function(a){return this.each(function(){var b=$(this);a=a.repla
 			
 			for(var i = 0; i < 2; i++){
 				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+game.position.x+'px, '+game.position.y+'px, 0) rotateX(30deg)';
+				styles[prefix+'transform'] = 'translate3d('+game.position.x+'px, '+game.position.y+'px, 0) rotateX('+game.viewingAngle+'deg)';
 			};
 			
 			
@@ -140,14 +141,72 @@ $.fn.removeStyle=function(a){return this.each(function(){var b=$(this);a=a.repla
 					};
 					
 					$wall.css(styles);
+					
+					// MAP FLOOR TILES
+					
+					if(wall.axis == 'y' && !negative){
+						var currentTile = [
+								wall.origin[0],
+								wall.origin[1]
+							];
+						
+						for(i = 0; i<wall.length; i++){
+						
+							game.renderFloorTile($room, currentTile);
+						   
+							for(var j = 0; j<game.levelData.world.width; j++){
+								currentTile[0]++;
+								var endRow = false;
+								$.each(room.walls, function(){
+									if(
+										this.axis == 'y' && 
+										-this.length > 0 &&
+										this.origin[0] == currentTile[0] &&
+										currentTile[1] < this.origin[1] &&
+										currentTile[1] >= this.origin[1] + this.length
+									){
+										endRow = true;
+										return false;
+									};
+								});
+								if(endRow){
+									break;
+								} else {
+									game.renderFloorTile($room, currentTile);
+								};
+							};
+							currentTile[0] = wall.origin[0]
+							currentTile[1]++;
+						};
+					
+					};
 						
 				});
+				
 			});
 			
 			game.renderFurniture();
 		},
+		
+		renderFloorTile: function($room, origin){
+			var $floorTile = $('<div class="floortile"/>').appendTo($room),
+				pos = game.originToPixels(origin),
+				styles = {};
+			
+			for(var i = 0; i < 2; i++){
+				var prefix = i == 0 ? game.prefix : '';
+				styles[prefix+'transform'] = 'translate3d('+pos.x+'px, '+pos.y+'px, 0px)';
+			};
+			
+			$floorTile.css({
+				width: game.tile+'px',
+				height: game.tile+'px'
+			}).css(styles);	
+		},
 
 		renderFurniture: function(){
+			
+			// EMPTY
 			
 			game.renderChars();
 		},
@@ -225,14 +284,26 @@ $.fn.removeStyle=function(a){return this.each(function(){var b=$(this);a=a.repla
 			
 			for(var i = 0; i < 2; i++){
 				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+game.position.x+'px, '+game.position.y+'px, 0) rotateX(30deg)';
+				styles[prefix+'transform'] = 'translate3d('+game.position.x+'px, '+game.position.y+'px, 0) rotateX('+game.viewingAngle+'deg)';
 			};
 			
 			game.$world.css(styles);
 		},
 
 		play: function(){
+			
+			// EMPTY
 
+		},
+		
+		originToPixels: function(origin){
+			var pixelX = origin[0] * game.tile,
+				pixelY = origin[1] * game.tile + game.tile;
+				
+			return {
+				x: pixelX,
+				y: -pixelY
+			};
 		},
 
 		getPrefix: function(){
