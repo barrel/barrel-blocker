@@ -376,7 +376,7 @@
 
 		play: function(){
 			
-			console.info(game)
+			alert('Welcome to Barrelblocker! - Use WASD to move.')
 			
 			// EMPTY
 
