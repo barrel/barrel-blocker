@@ -66,13 +66,15 @@ body {
 
 .char{
 	position: absolute;
-	background: #000;
+	background: red;
 }
 
 .player{
 	left: 50%;
 	top: 50%;
 	.absolute-center(@grid, @grid);
+	
+	margin-top: -(@grid);
 	
 	.transform(rotateX(-60deg));
 	.transform-style(preserve-3d);
