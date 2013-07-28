@@ -150,31 +150,34 @@
 				$.each(room.walls,function(){
 					var wall = this,
 						negative = -wall.length > 0 ? true : false,
-						length = negative ? -wall.length : wall.length,
-						$wall = $('<div class="wall '+wall.axis+'-plane" style="background-color: '+wall.background+'"/>').appendTo($room),
-						x,
-						y;
-						
+						className = (negative ? ' negative' : '') + (wall.backfaceVisible ? ' backface' : ''),
+						pxLength = negative ? -wall.length : wall.length,
+						$wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background-color: '+wall.background+'"/>').appendTo($room),
+						translateX,
+						translateY;	
 						
 					$wall.css({
-						'width': game.tile * length+'px',
+						'width': game.tile * pxLength+'px',
 						'height': game.tile * 4
 					});
 					
 					if(wall.axis == 'x'){
-						y = -wall.origin[1] * game.tile;
-						x = negative ? (game.tile * wall.origin[0]) - (game.tile * length) : game.tile * wall.origin[0];
+						translateX = (wall.origin[0] + wall.length) * game.tile;
+						translateY = -wall.origin[1] * game.tile;
+						rotate = negative ? 'rotateX(90deg) rotateY(0deg)':
+						 					'rotateX(90deg) rotateY(180deg)';
 					} else {
-						x = wall.origin[0] * game.tile;
-						y = negative ? -((game.tile * wall.origin[1]) - (game.tile * length)) : -game.tile * wall.origin[1];
+						translateX = wall.origin[0] * game.tile;
+						translateY = -(wall.origin[1] + wall.length) * game.tile;
+						rotate = negative ? 'rotateX(90deg) rotateY(270deg)':
+						 					'rotateX(90deg) rotateY(90deg)';
 					};
 					
-					var styles = {},
-						rotate = wall.axis == 'x' ? 'rotateX(90deg)' : 'rotateZ(270deg) rotateX(90deg)';
+					var styles = {};	
 					
 					for(var i = 0; i < 2; i++){
 						var prefix = i == 0 ? game.prefix : '';
-						styles[prefix+'transform'] = 'translate3d('+x+'px, '+y+'px, 0px) '+rotate;
+						styles[prefix+'transform'] = 'translate3d('+translateX+'px, '+translateY+'px, 0px) '+rotate;
 					};
 					
 					$wall.css(styles);

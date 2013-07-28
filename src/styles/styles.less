@@ -62,8 +62,12 @@ body {
 
 .wall{
 	position: absolute;
+	
 
 	.transform-origin(0%, 0%);
+	&:not(.backface){
+		.wf();
+	}
 	
 	border: 1px solid #000;
 	
