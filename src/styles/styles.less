@@ -82,46 +82,61 @@ body {
 
 .char{
 	position: absolute;
-	background: red;
+	left: 0;
+	bottom: -@grid;
+	
+	.transform-style(preserve-3d);
 }
 
+@playerRotateX: 90deg;
+
 .player{
-	left: 50%;
-	top: 50%;
-	.absolute-center(@grid, @grid);
-	
-	margin-top: -(@grid);
-	
-	.transform(rotateX(-60deg));
-	.transform-style(preserve-3d);
-	
-	.transition(all 200ms);
-	
-	&.down{
-		.transform(rotateX(-60deg) rotateY(180deg));
-	}
-	
-	&.left{
-		.transform(rotateX(-60deg) rotateY(90deg));
-	}
-	
-	&.right{
-		.transform(rotateX(-60deg) rotateY(270deg));
-	}
-	
-	&:after{
-		content: '';
-		display: block;
+	.avatar{
 		position: absolute;
-		left: 0;
-		bottom: 0;
+		left: 50%;
+		top: 50%;
+		margin-left: -@grid/2;
 		width: @grid;
-		height: 5px;
-		border-radius: 100%;
-		background: rgba(0,0,0,.15);
+		height: 2*@grid;
+		background: red;
 		
-		box-shadow: 0 0 30px #000;
+		.transition(all 200ms);
+		.transform-origin(50%, 0%);
+		.transform-style(preserve-3d);
 		
-		.transform(rotateX(90deg) translate3d(0, 0px, 0))
+		.transform(rotateX(@playerRotateX));
+		
+	
+		.down&{
+			.transform(rotateX(@playerRotateX) rotateY(180deg));
+		}
+	
+		.right&{
+			.transform(rotateX(@playerRotateX) rotateY(90deg));
+		}
+	
+		.left&{
+			.transform(rotateX(@playerRotateX) rotateY(270deg));
+		}
+	
+		.player[data-room='garage']&{
+			background: #fff;
+		}
+	
+		&:after{
+			content: '';
+			display: block;
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: @grid;
+			height: 5px;
+			border-radius: 100%;
+			background: rgba(0,0,0,.15);
+		
+			box-shadow: 0 0 30px #000;
+		
+			.transform(rotateX(90deg) translate3d(0, 0, 195px))
+		}
 	}
 }

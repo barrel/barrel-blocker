@@ -21,9 +21,17 @@
 			x: null,
 			y: null
 		},
-		player: {
-			x: null,
-			y: null
+		characters: {
+			player: {
+				dir: null,
+				domObj : null,
+				x: null,
+				y: null,
+				bb: {
+					width: 0.1,
+					height: 0.1
+				}
+			}
 		},
 		currentRoom: null,
 		collisionMatrix: {
@@ -83,13 +91,13 @@
 					game.tile = typeof game.levelData.tile !== 'undefined' ? game.levelData.tile : game.tile;
 					game.world.width = game.tile * game.levelData.world.width;
 					game.world.length = game.tile * game.levelData.world.length;
-					game.player = {
+					$.extend(game.characters.player, {
 						x: game.levelData.startPos[0],
 						y: game.levelData.startPos[1]
-					};
+					});
 					game.camera = {
-						x: game.tile * ((game.levelData.world.width / 2) - game.player.x),
-						y: -game.tile * ((game.levelData.world.length / 2) - game.player.y)
+						x: game.tile * ((game.levelData.world.width / 2) - game.characters.player.x),
+						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
 					};
 					game.cameraSpeed = game.speed * game.tile;
 					game.moveCamera();
@@ -257,7 +265,7 @@
 							var row = this;
 							if(typeof quads[index] === 'undefined'){
 								quads[index] = {
-									origin: [row[0]],
+									origin: row[0],
 									width: row.length,
 									height: 1
 								};
@@ -295,8 +303,8 @@
 					$floorTile = $('<div class="floortile" style="background: '+room.floor.background+'"/>').appendTo($room),
 					pos = game.positionInPixels(quad),
 					absOrigin = [
-						quad.origin[0][0] + room.origin[0],
-						quad.origin[0][1] + room.origin[1]
+						quad.origin[0] + room.origin[0],
+						quad.origin[1] + room.origin[1]
 					];
 					
 				quad.domNode = $floorTile[0];
@@ -349,17 +357,22 @@
 
 		renderChars: function(){
 			
-			game.$player = $('<div class="char player"/>').insertAfter(game.$world);
-			game.player = {
+			game.$player = $('<div class="char player"><div class="avatar"/></div>').appendTo(game.$world);
+			$.extend(game.characters.player,{ 
+				dir: 'up',
+				domObj: game.$player[0],
 				x: game.levelData.startPos[0],
-				y: game.levelData.startPos[1]
-			};
-			game.currentRoom = game.detectRoom(game.player);
+				y: game.levelData.startPos[1]	
+			});
+			game.currentRoom = game.detectRoom(game.characters.player);
+			game.$player.attr('data-room',game.currentRoom.roomname);
 			
 			game.$player.css({
-				width: game.tile+'px',
-				height: 2 * game.tile+'px'
+				width: (game.characters.player.bb.width * game.tile)+'px',
+				height: (game.characters.player.bb.height * game.tile)+'px'
 			});
+			
+			game.moveCharacter(game.characters.player);
 			
 			game.bindControls();
 		},
@@ -397,7 +410,7 @@
 							keystates[key] = true;
 							game.$player.removeClass('up down left right').addClass(key);
 							game.movements[key] = setInterval(function(){
-								game.movePlayer(key);
+								game.move(key);
 							},1000/game.framerate);
 					};
 				},
@@ -415,18 +428,18 @@
 		},
 		
 		/*
-		*	MOVE PLAYER
+		*	MOVE
 		*	@arg: direction / string
 		*	
 		*	Calculates player and camera positions.
 		*	Updates new positions if no collisions.
 		*/
 		
-		movePlayer: function(direction){
+		move: function(direction){
 			
 			var newPlayerPos = {
-					x: game.player.x,
-					y: game.player.y
+					x: game.characters.player.x,
+					y: game.characters.player.y
 				},
 				newCameraPos = {
 					x: game.camera.x,
@@ -434,33 +447,63 @@
 				};
 			
 			if(direction == 'up'){
-				newPlayerPos.y = (game.player.y + game.speed).toFixed(1) * 1;
+				newPlayerPos.y = (game.characters.player.y + game.speed).toFixed(1) * 1;
 				newCameraPos.y = game.camera.y + game.cameraSpeed;
 			} else if(direction == 'down'){
-				newPlayerPos.y = (game.player.y - game.speed).toFixed(1) * 1;
+				newPlayerPos.y = (game.characters.player.y - game.speed).toFixed(1) * 1;
 				newCameraPos.y = game.camera.y - game.cameraSpeed;
 			} else if(direction == 'left'){
-				newPlayerPos.x = (game.player.x - game.speed).toFixed(1) * 1;
+				newPlayerPos.x = (game.characters.player.x - game.speed).toFixed(1) * 1;
 				newCameraPos.x = game.camera.x + game.cameraSpeed;
 			} else if(direction == 'right'){
-				newPlayerPos.x = (game.player.x + game.speed).toFixed(1) * 1;
+				newPlayerPos.x = (game.characters.player.x + game.speed).toFixed(1) * 1;
 				newCameraPos.x = game.camera.x - game.cameraSpeed;
 			};
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
-			var collision = game.detectCollision(newPlayerPos);
+			var collision = game.detectCollision(newPlayerPos, direction, game.characters.player.bb);
 				
 			
 			if(!collision.collided){
-				game.player = newPlayerPos;
+				$.extend(game.characters.player,{
+					dir: direction,
+					x: newPlayerPos.x,
+					y: newPlayerPos.y
+				});
 				game.camera = newCameraPos;
-				game.currentRoom = game.detectRoom(game.player);
+				game.currentRoom = game.detectRoom(game.characters.player);
+				game.$player.attr('data-room',game.currentRoom.roomname);
 			} else {
 				return false;
 			};
 			
+			game.moveCharacter(game.characters.player)
 			game.moveCamera();
+		},
+		
+		/*
+		*	ANIMATE CHARACTER
+		*	@arg: player / Player object
+		*
+		*	Moves rendered characters in world
+		*/
+		
+		moveCharacter: function(player){
+			var translate = game.positionInPixels({
+				width: 1,
+				height: 1,
+				origin: [player.x,player.y]
+			});
+			
+			var styles = {};
+			
+			for(var i = 0; i < 2; i++){
+				var prefix = i == 0 ? game.prefix : '';
+				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, 0)';
+			};
+		
+			$(player.domObj).css(styles);
 		},
 		
 		/*
@@ -483,23 +526,30 @@
 		/*
 		*	DETECT COLLISION
 		*	@arg: position / Absolute co-ordinate array
+		*	@arg: direction / String
+		*	@arge: bb / bounding box width+height array
 		* 	return collision object
 		*
 		*	Checks player position against all objects in collision matrix on perpendicular axis.
 		*/
 		
-		detectCollision: function(position){
-			var collision = false;
+		detectCollision: function(position, direction, bb){
+			var collision = false,
+				edge = {};
+	
+			edge.x = direction == 'right' ? position.x + bb.width : position.x; 
+			edge.y = direction == 'up' ? position.y + bb.height : position.y;
+			
 			for(i = 0; i < 2; i++){
 				var axis = i == 0 ? 'x' : 'y',
 					perpAxis = i == 0 ? 'y' : 'x';
 					
-				if(typeof game.collisionMatrix[axis][position[axis]] !== 'undefined'){
-					$.each(game.collisionMatrix[axis][position[axis]], function(i){
+				if(typeof game.collisionMatrix[axis][edge[axis]] !== 'undefined'){
+					$.each(game.collisionMatrix[axis][edge[axis]], function(i){
 						var collisionObject = this;
 						if(
-							game.player[perpAxis] >= collisionObject[perpAxis+'Min'] && 
-							game.player[perpAxis] <= collisionObject[perpAxis+'Max']
+							game.characters.player[perpAxis] >= collisionObject[perpAxis+'Min'] && 
+							game.characters.player[perpAxis] <= collisionObject[perpAxis+'Max']
 						){
 							collision = {
 								collided: true,
@@ -526,10 +576,10 @@
 			$.each(game.floorTiles, function(i){
 				floorTile = this;
 				if(
-					game.player.x >= floorTile.xMin &&
-					game.player.x <= floorTile.xMax &&
-					game.player.y >= floorTile.yMin &&
-					game.player.y <= floorTile.yMax
+					game.characters.player.x >= floorTile.xMin &&
+					game.characters.player.x <= floorTile.xMax &&
+					game.characters.player.y >= floorTile.yMin &&
+					game.characters.player.y <= floorTile.yMax
 				){
 					index = i;
 				}
@@ -549,7 +599,7 @@
 
 		play: function(){
 			
-			//alert('Welcome to Barrelblocker! - Use WASD to move.')
+			alert('Welcome to Barrelblocker! - Use WASD to move.')
 			console.info(game)
 			
 			var refreshHud = setInterval(function(){
@@ -569,12 +619,12 @@
 		*/
 		
 		positionInPixels: function(obj){
-			var pixelX = obj.origin[0][0] * game.tile,
-				pixelY = (obj.origin[0][1] * game.tile) + (obj.height * game.tile);
+			var pixelX = obj.origin[0] * game.tile,
+				pixelY = (obj.origin[1] * game.tile) + (obj.height * game.tile);
 				
 			return {
-				x: pixelX,
-				y: -pixelY
+				x: pixelX.toFixed() * 1,
+				y: -pixelY.toFixed() * 1
 			};
 		},
 		
