@@ -30,7 +30,18 @@
 						"length": -4,
 						"background": "#fff"
 					},
-					
+					{
+						"origin": [8,4],
+						"axis": "x",
+						"length": 0.5,
+						"background": "#fff"
+					},
+					{
+						"origin": [9.5,4],
+						"axis": "x",
+						"length": 0.5,
+						"background": "#fff"
+					},
 					{
 						"origin": [10,4],
 						"axis": "y",
@@ -84,6 +95,18 @@
 						"origin": [10,0],
 						"axis": "y",
 						"length": -4,
+						"background": "red"
+					},
+					{
+						"origin": [10,-4],
+						"axis": "x",
+						"length": -0.5,
+						"background": "red"
+					},
+					{
+						"origin": [8.5,-4],
+						"axis": "x",
+						"length": -0.5,
 						"background": "red"
 					},
 					{

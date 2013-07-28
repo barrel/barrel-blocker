@@ -12,7 +12,7 @@
 		cameraSpeed: null,
 		framerate: 58,
 		actualFPS: null,
-		viewingAngle: 50,
+		viewingAngle: 20,
 		world: {
 			width: null,
 			height: null
