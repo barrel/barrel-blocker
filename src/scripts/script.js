@@ -16,6 +16,7 @@
 			width: null,
 			height: null
 		},
+		rooms: {},
 		camera: {
 			x: null,
 			y: null
@@ -24,10 +25,12 @@
 			x: null,
 			y: null
 		},
-		collisionMatrix:{
+		currentRoom: null,
+		collisionMatrix: {
 			x: {},
 			y: {}
 		},
+		floorTiles: [],
 		controls: {
 			keycodes: {
 				up: 87,
@@ -48,18 +51,32 @@
 			left: null,
 			right: null
 		},
+		
+		/*
+		*	INITIALIZE
+		*	@arg: url / url of JSON level file
+		*
+		*	Instantiates game on world DOM object.
+		*/
+		
 		init: function(url){
 			return this.each(function(){
-				game.prefix = game.getPrefix();
 				game.$world = $(this);
 				game.getLevelData(url);
 			});
 		},
+		
+		/*
+		*	GET LEVEL DATA
+		*	@arg: url / url of JSON level file
+		*
+		*	Loads JSON level file and declares misc object vars.
+		*/
 
 		getLevelData: function(url){
 			$.getJSON(url, function(data){
 				game.levelData = data.level;
-				
+				game.prefix = game.getPrefix();
 				game.tile = typeof game.levelData.tile !== 'undefined' ? game.levelData.tile : game.tile;
 				game.world.width = game.tile * game.levelData.world.width;
 				game.world.length = game.tile * game.levelData.world.length;
@@ -82,6 +99,13 @@
 				game.renderEnvironment();
 			});
 		},
+		
+		/*
+		*	RENDER ENVIRONMENT
+		*	
+		*	Renders rooms, walls, and floors.
+		*	Adds walls to collision matrix.
+		*/
 
 		renderEnvironment: function(){
 			
@@ -92,18 +116,26 @@
 				// CREATE ROOM
 				
 				var room = this,
-					$room = $('<div class="room" id="'+this.roomname+'"/>').appendTo(game.$world);
+					$room = $('<div class="room" id="'+room.roomname+'"/>').appendTo(game.$world);
+					
+				// POSITION ROOM
 					
 				var styles = {};
 				
 				for(var i = 0; i < 2; i++){
 					var prefix = i == 0 ? game.prefix : '';
-					styles[prefix+'transform'] = 'translate3d('+game.tile * this.origin[0]+'px, '+(game.world.length - (game.tile * this.origin[1]))+'px, 0)';
+					styles[prefix+'transform'] = 'translate3d('+game.tile * room.origin[0]+'px, '+(game.world.length - (game.tile * room.origin[1]))+'px, 0)';
 				};
-				
-				// POSITION ROOM
 			
 				$room.css(styles);
+				
+				// BUILD ROOM OBJECT
+				
+				game.rooms[room.roomname] = {
+					domNode: $room[0],
+					floor: [],
+					absOrigin: room.origin
+				};
 				
 				// FOR EACH WALL
 				
@@ -158,7 +190,7 @@
 						perpEnd = absoluteOrigin[perpAxisPos] + wall.length,
 						collisionObject = {
 							objectType: 'wall',
-							domObj: $wall[0]
+							domNode: $wall[0]
 						};
 						
 					collisionObject[wall.axis+'Min'] = perpStart > perpEnd ? perpEnd : perpStart;
@@ -172,11 +204,13 @@
 						var currentTile = [
 								wall.origin[0],
 								wall.origin[1]
-							];
+							],
+							rows = [];
 						
-						for(i = 0; i<wall.length; i++){
-						
-							game.renderFloorTile($room, currentTile);
+						for(currentTile[1] = 0; currentTile[1]<wall.length; currentTile[1]++){
+							var row = [];
+
+							row.push([currentTile[0],currentTile[1]]);
 						   
 							for(var j = 0; j<game.levelData.world.width; j++){
 								currentTile[0]++;
@@ -190,18 +224,41 @@
 										currentTile[1] >= this.origin[1] + this.length
 									){
 										endRow = true;
-										return false;
+										return;
 									};
 								});
 								if(endRow){
+									rows.push(row);
 									break;
 								} else {
-									game.renderFloorTile($room, currentTile);
+									row.push([currentTile[0],currentTile[1]]);
 								};
 							};
 							currentTile[0] = wall.origin[0]
-							currentTile[1]++;
 						};
+						
+						// OPTIMIZE FLOOR MAP
+						
+						var quads = [],
+							index = 0;
+						
+						$.each(rows, function(i){
+							var row = this;
+							if(typeof quads[index] === 'undefined'){
+								quads[index] = {
+									origin: [row[0]],
+									width: row.length,
+									height: 1
+								};
+							}
+							if(i < rows.length-1 && row.length == rows[i+1].length){
+								quads[index].height++;
+							} else {
+								index++;
+							};
+						});
+						
+						game.renderFloorTiles($room, room, quads);
 					
 					};
 						
@@ -212,21 +269,59 @@
 			game.renderFurniture();
 		},
 		
-		renderFloorTile: function($room, origin){
-			var $floorTile = $('<div class="floortile"/>').appendTo($room),
-				pos = game.originToPixels(origin),
-				styles = {};
+		/*
+		*	RENDER FLOOR TILES
+		*	@arg: 	$room / jQuery object
+		*	@arg: 	quads / Array of optimized quadrilaterals
+		*
+		*	Appends floor tiles to room.
+		*	Adds floor meta data to game object.			
+		*/
+		
+		renderFloorTiles: function($room, room, quads){
+			$.each(quads,function(){
+				var quad = this,
+					$floorTile = $('<div class="floortile" style="background: '+room.floor.background+'"/>').appendTo($room),
+					pos = game.positionInPixels(quad),
+					absOrigin = [
+						quad.origin[0][0] + room.origin[0],
+						quad.origin[0][1] + room.origin[1]
+					];
+					
+				quad.domNode = $floorTile[0];
+				
+				game.rooms[room.roomname].floor.push(quad);
+				game.floorTiles.push({
+					parentRoom: room.roomname,
+					parentdomNode: $room[0],
+					absOrigin: absOrigin,
+					xMin: absOrigin[0],
+					xMax: absOrigin[0] + quad.width,
+					yMin: absOrigin[1],
+					yMax: absOrigin[1] + quad.height
+				});
+				
+				var styles = {};
+
+				for(var i = 0; i < 2; i++){
+					var prefix = i == 0 ? game.prefix : '';
+					styles[prefix+'transform'] = 'translate3d('+pos.x+'px, '+pos.y+'px, 0px)';
+				};
+
+				$floorTile.css({
+					width: game.tile * quad.width+'px',
+					height: game.tile * quad.height+'px'
+				}).css(styles);
+				
+			});
 			
-			for(var i = 0; i < 2; i++){
-				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+pos.x+'px, '+pos.y+'px, 0px)';
-			};
-			
-			$floorTile.css({
-				width: game.tile+'px',
-				height: game.tile+'px'
-			}).css(styles);	
 		},
+		
+		/*
+		*	RENDER FURNITURE
+		*
+		*	Renders 2D & 3D furniture objects and adds to collision matrix.		
+		*/
 
 		renderFurniture: function(){
 			
@@ -234,6 +329,12 @@
 			
 			game.renderChars();
 		},
+		
+		/*
+		*	RENDER CHARACTERS
+		*
+		*	Renders player and all NPCs.
+		*/
 
 		renderChars: function(){
 			
@@ -248,13 +349,15 @@
 				height: 2 * game.tile+'px'
 			});
 			
-			game.$player.css({
-				width: game.tile+'px',
-				height: 2 * game.tile+'px'
-			});
-			
 			game.bindControls();
 		},
+		
+		/*
+		*	BIND CONTROLS
+		*
+		*	Binds movement loops to key codes,
+		*	Listens for keyup/down.
+		*/
 
 		bindControls: function(){
 			var keycodes = game.controls.keycodes,
@@ -299,6 +402,14 @@
 			game.play();
 		},
 		
+		/*
+		*	MOVE PLAYER
+		*	@arg: direction / string
+		*	
+		*	Calculates player and camera positions.
+		*	Updates new positions if no collisions.
+		*/
+		
 		movePlayer: function(direction){
 			
 			var newPlayerPos = {
@@ -327,16 +438,24 @@
 			// DETECT COLLISIONS
 			
 			var collision = game.detectCollision(newPlayerPos);
+				
 			
 			if(!collision.collided){
 				game.player = newPlayerPos;
 				game.camera = newCameraPos;
+				game.currentRoom = game.detectRoom(game.player);
 			} else {
 				return false;
 			};
 			
 			game.moveCamera();
 		},
+		
+		/*
+		*	MOVE CAMERA
+		*
+		*	Moves camera while player is moving.
+		*/
 		
 		moveCamera: function(){
 			var styles = {};
@@ -348,6 +467,14 @@
 			
 			game.$world.css(styles);	
 		},
+		
+		/*
+		*	DETECT COLLISION
+		*	@arg: position / Absolute co-ordinate array
+		* 	return collision object
+		*
+		*	Checks player position against all objects in collision matrix on perpendicular axis.
+		*/
 		
 		detectCollision: function(position){
 			var collision = false;
@@ -373,24 +500,79 @@
 			};
 			return collision;
 		},
+		
+		/*
+		*	DETECT COLLISION
+		*	@arg: position / Absolute co-ordinate array
+		*	return roomname and dom node
+		*
+		*	Checks player position against all objects in collision matrix on perpendicular axis.
+		*/
+		
+		detectRoom: function(position){
+			var index = null
+			$.each(game.floorTiles, function(i){
+				floorTile = this;
+				if(
+					game.player.x >= floorTile.xMin &&
+					game.player.x <= floorTile.xMax &&
+					game.player.y >= floorTile.yMin &&
+					game.player.y <= floorTile.yMax
+				){
+					index = i;
+				}
+			});
+			
+			return {
+				roomname: game.floorTiles[index].parentRoom,
+				domNode: game.floorTiles[index].domNode
+			};
+		},
+		
+		/*
+		*	PLAY
+		*
+		*	Manages HUD, interactions, scoring etc
+		*/
 
 		play: function(){
 			
 			alert('Welcome to Barrelblocker! - Use WASD to move.')
+			console.info(game)
+			
+			var refreshHud = setInterval(function(){
+				$('#RoomName').text(game.currentRoom.roomname);
+			},100);
 			
 			// EMPTY
 
 		},
 		
-		originToPixels: function(origin){
-			var pixelX = origin[0] * game.tile,
-				pixelY = origin[1] * game.tile + game.tile;
+		/*
+		*	POSITION IN PIXELS
+		*	@arg: obj / Object containing width, height and origin
+		*	return co-ordinate object for translate3d
+		*
+		*	Positions a quadrilateral object in pixel space
+		*/
+		
+		positionInPixels: function(obj){
+			var pixelX = obj.origin[0][0] * game.tile,
+				pixelY = (obj.origin[0][1] * game.tile) + (obj.height * game.tile);
 				
 			return {
 				x: pixelX,
 				y: -pixelY
 			};
 		},
+		
+		/*
+		*	GET PREFIX
+		*	return prefix string or false	
+		*
+		*	Gets vendor prefix for current browser.
+		*	Returns false if no transition support.
+		*/
 
 		getPrefix: function(){
 			var $el = $('body'),
@@ -407,6 +589,10 @@
 		}
 
 	};
+	
+	/*
+	*	DECLARE BARREL BLOCKER METHOD
+	*/
 
 	$.fn.barrelBlocker = function(url){
 		return game.init.apply(this, arguments);

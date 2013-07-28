@@ -9,7 +9,7 @@
 		"startPos": [10,7],
 		"rooms": [
 			{
-				"roomname": "Office",
+				"roomname": "office",
 				"origin": [5,5],
 				"walls": [
 					{
@@ -49,7 +49,10 @@
 						"background": "rgba(255,255,255,.8)"
 					}
 					
-				]
+				],
+				"floor": {
+					"background" : "#fff"
+				}
 		
 			}
 		]
