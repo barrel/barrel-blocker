@@ -25,7 +25,7 @@
 		characters: {
 			player: {
 				dir: null,
-				domObj : null,
+				domNode : null,
 				x: null,
 				y: null,
 				bb: {
@@ -102,7 +102,7 @@
 						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
 					};
 					
-					var cameraTransform = game.getTransformCSS(game.camera, 'rotateX('+game.viewingAngle+'deg)');
+					var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
 					
 					game.$world.css({
 						width: game.world.width+'px',
@@ -161,11 +161,11 @@
 				$.each(room.walls,function(){
 					var wall = this,
 						negative = -wall.length > 0 ? true : false,
-						className = (negative ? ' negative' : '') + (wall.backfaceVisible ? ' backface' : ''),
+						className = (negative ? ' negative' : '') + (wall.backfaceVisible ? ' backface' : '') + (wall.portal ? ' portal' : ''),
 						pxLength = negative ? -wall.length : wall.length,
 						$wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background-color: '+wall.background+'"/>').appendTo($room),
-						translateX,
-						translateY;	
+						translate = {},
+						rotate = {};
 						
 					$wall.css({
 						'width': game.tile * pxLength+'px',
@@ -173,25 +173,25 @@
 					});
 					
 					if(wall.axis == 'x'){
-						translateX = (wall.origin[0] + wall.length) * game.tile;
-						translateY = -wall.origin[1] * game.tile;
+						translate.x = (wall.origin[0] + wall.length) * game.tile;
+						translate.y = -wall.origin[1] * game.tile;
 						rotate = negative ? 'rotateX(90deg) rotateY(0deg)':
 						 					'rotateX(90deg) rotateY(180deg)';
+						rotate = negative ? {x: 90, y: 0, z: 0} : {x: 90, y: 180, z: 0};
 					} else {
-						translateX = wall.origin[0] * game.tile;
-						translateY = -(wall.origin[1] + wall.length) * game.tile;
+						translate.x = wall.origin[0] * game.tile;
+						translate.y = -(wall.origin[1] + wall.length) * game.tile;
 						rotate = negative ? 'rotateX(90deg) rotateY(270deg)':
 						 					'rotateX(90deg) rotateY(90deg)';
+						rotate = negative ? {x: 90, y: 270, z: 0} : {x: 90, y: 90, z: 0};
 					};
 					
-					var styles = {};	
+					$wall.data('translate',translate);
+					$wall.data('rotate',rotate);
 					
-					for(var i = 0; i < 2; i++){
-						var prefix = i == 0 ? game.prefix : '';
-						styles[prefix+'transform'] = 'translate3d('+translateX+'px, '+translateY+'px, 0px) '+rotate;
-					};
-					
-					$wall.css(styles);
+					var wallTransform = game.getTransformCSS(translate, rotate);	
+				
+					$wall.css(wallTransform);
 					
 					// ADD TO COLLISION MATRIX
 					
@@ -206,13 +206,18 @@
 					if(typeof game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] === 'undefined'){
 						game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] = [];
 					};
-						
+					
 					var entry = game.collisionMatrix[collideWith][absoluteOrigin[axisPos]],
 						perpStart = absoluteOrigin[perpAxisPos],
 						perpEnd = absoluteOrigin[perpAxisPos] + wall.length,
 						collisionObject = {
-							objectType: 'wall',
+							objectType: wall.portal ? 'portal' : 'wall',
+							collide: wall.portal ? false : true,
 							domNode: $wall[0]
+						};
+						
+						if(wall.portal){
+							collisionObject.open = false;
 						};
 						
 					collisionObject[wall.axis+'Min'] = perpStart > perpEnd ? perpEnd : perpStart;
@@ -363,7 +368,7 @@
 			game.$player = $('<div class="char player"><div class="avatar"/></div>').appendTo(game.$world);
 			$.extend(game.characters.player,{ 
 				dir: 'up',
-				domObj: game.$player[0],
+				domNode: game.$player[0],
 				x: game.levelData.startPos[0],
 				y: game.levelData.startPos[1]	
 			});
@@ -468,8 +473,7 @@
 			
 			var collision = game.detectCollision(newPlayerPos, direction, game.characters.player.bb);
 				
-			
-			if(!collision.collided){
+			if(!collision.collided || collision.collided && collision.object.objectType == 'portal'){
 				$.extend(game.characters.player,{
 					dir: direction,
 					x: newPlayerPos.x,
@@ -478,11 +482,31 @@
 				game.camera = newCameraPos;
 				game.currentRoom = game.detectRoom(game.characters.player);
 				game.$player.attr('data-room',game.currentRoom.roomname);
-			} else {
-				return false;
+				game.moveCharacter(game.characters.player);
 			};
 			
-			game.moveCharacter(game.characters.player)
+			if(collision.collided){
+				
+				// IF GOING THROUGH A DOOR
+				
+				if(collision.object.objectType == 'portal'){
+					var $door = $(collision.object.domNode),
+						doorTranslate = $door.data('translate'),
+						doorRotate = $door.data('rotate');
+						doorAngle = 180;
+					
+					if(!collision.object.open){
+						doorAngle = 277
+						collision.object.open = true;
+					} else {
+						collision.object.open = false;
+					}
+				
+					doorTransform = game.getTransformCSS(doorTranslate, {x: doorRotate.x, y: doorAngle, z: doorRotate.z});
+						
+					$door.css(doorTransform);
+				};
+			};
 		},
 		
 		/*
@@ -499,7 +523,7 @@
 				origin: [character.x,character.y]
 			});
 			
-			$(character.domObj).data('translate',translate);
+			$(character.domNode).data('translate',translate);
 		},
 		
 		/*
@@ -513,7 +537,9 @@
 		*/
 		
 		detectCollision: function(position, direction, bb){
-			var collision = false,
+			var collision = {
+					collided: false
+				},
 				edge = {};
 	
 			edge.x = direction == 'right' ? position.x + bb.width : position.x; 
@@ -530,10 +556,10 @@
 							game.characters.player[perpAxis] >= collisionObject[perpAxis+'Min'] && 
 							game.characters.player[perpAxis] <= collisionObject[perpAxis+'Max']
 						){
-							collision = {
+							$.extend(collision, {
 								collided: true,
 								object: collisionObject
-							};
+							});
 							return false;
 						};
 					});
@@ -593,7 +619,7 @@
 				
 				// REDRAW CAMERA
 				
-				var cameraTransform = game.getTransformCSS(game.camera, 'rotateX('+game.viewingAngle+'deg)');
+				var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
 
 				game.$world.css(cameraTransform);
 				
@@ -614,11 +640,11 @@
 		},
 		
 		getTransformCSS: function(translate, rotate){
-			rotate = rotate ? rotate : '';
+			rotate = rotate ? rotate : {x: 0, y: 0, z: 0};
 			var styles = {};
 			for(var i = 0; i < 2; i++){
 				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, 0) '+rotate;
+				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, 0) rotateX('+rotate.x+'deg) rotateY('+rotate.y+'deg) rotateZ('+rotate.z+'deg)';
 			};
 			return styles;
 		},
