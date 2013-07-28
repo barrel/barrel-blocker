@@ -11,7 +11,8 @@
 		speed: 0.1,
 		cameraSpeed: null,
 		framerate: 50,
-		viewingAngle: 30,
+		actualFPS: null,
+		viewingAngle: 50,
 		world: {
 			width: null,
 			height: null
@@ -31,7 +32,8 @@
 					width: 0.1,
 					height: 0.1
 				}
-			}
+			},
+			npcs: []
 		},
 		currentRoom: null,
 		collisionMatrix: {
@@ -100,12 +102,14 @@
 						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
 					};
 					game.cameraSpeed = game.speed * game.tile;
-					game.moveCamera();
+					
+					var cameraTransform = game.getTransformCSS(game.camera, 'rotateX('+game.viewingAngle+'deg)');
+					
 					game.$world.css({
 						width: game.world.width+'px',
 						height: game.world.length+'px',
 						margin: (game.world.length / -2)+'px 0 0 '+(game.world.width / -2)+'px'
-					});
+					}).css(cameraTransform);
 
 					game.renderEnvironment();
 				},
@@ -424,6 +428,7 @@
 				}
 			});
 			
+			game.draw();
 			game.play();
 		},
 		
@@ -479,48 +484,23 @@
 			};
 			
 			game.moveCharacter(game.characters.player)
-			game.moveCamera();
 		},
 		
 		/*
-		*	ANIMATE CHARACTER
+		*	MOVE CHARACTER
 		*	@arg: player / Player object
 		*
-		*	Moves rendered characters in world
+		*	Updates translation values for character;
 		*/
 		
-		moveCharacter: function(player){
+		moveCharacter: function(character){
 			var translate = game.positionInPixels({
 				width: 1,
 				height: 1,
-				origin: [player.x,player.y]
+				origin: [character.x,character.y]
 			});
 			
-			var styles = {};
-			
-			for(var i = 0; i < 2; i++){
-				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, 0)';
-			};
-		
-			$(player.domObj).css(styles);
-		},
-		
-		/*
-		*	MOVE CAMERA
-		*
-		*	Moves camera while player is moving.
-		*/
-		
-		moveCamera: function(){
-			var styles = {};
-			
-			for(var i = 0; i < 2; i++){
-				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+game.camera.x+'px, '+game.camera.y+'px, 0) rotateX('+game.viewingAngle+'deg)';
-			};
-			
-			game.$world.css(styles);	
+			$(character.domObj).data('translate',translate);
 		},
 		
 		/*
@@ -592,6 +572,59 @@
 		},
 		
 		/*
+		*	DRAW
+		*
+		*	Global front-end redraw function
+		*/
+		
+		draw: function(){
+			
+			var startFrame = new Date().getTime(),
+				refresh = setInterval(function(){
+				
+				// REDRAW PLAYER
+				
+				var playerTransform = game.getTransformCSS(game.$player.data('translate'));
+				
+				game.$player.css(playerTransform);
+				
+				// REDRAW NPCs
+				
+				
+				
+				// REDRAW CAMERA
+				
+				var cameraTransform = game.getTransformCSS(game.camera, 'rotateX('+game.viewingAngle+'deg)');
+
+				game.$world.css(cameraTransform);
+				
+				// UPDATE HUD
+				
+				$('#RoomName').text(game.currentRoom.roomname);
+				$('#FPS').text(game.actualFPS+'fps');
+				
+				// GET FRAMERATE
+				
+				var endFrame = new Date().getTime(),
+					frameDuration = endFrame - startFrame;
+					game.actualFPS = (1000/frameDuration).toFixed(1);
+					startFrame = endFrame;
+				
+			},1000/game.framerate);
+			
+		},
+		
+		getTransformCSS: function(translate, rotate){
+			rotate = rotate ? rotate : '';
+			var styles = {};
+			for(var i = 0; i < 2; i++){
+				var prefix = i == 0 ? game.prefix : '';
+				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, 0) '+rotate;
+			};
+			return styles;
+		},
+		
+		/*
 		*	PLAY
 		*
 		*	Manages HUD, interactions, scoring etc
@@ -599,14 +632,8 @@
 
 		play: function(){
 			
-			alert('Welcome to Barrelblocker! - Use WASD to move.')
-			console.info(game)
-			
-			var refreshHud = setInterval(function(){
-				$('#RoomName').text(game.currentRoom.roomname);
-			},100);
-			
-			// EMPTY
+			alert('Welcome to Barrelblocker! - Use WASD to move.');
+			console.info(game);
 
 		},
 		
