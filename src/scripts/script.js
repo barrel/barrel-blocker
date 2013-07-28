@@ -169,7 +169,7 @@
 						
 					$wall.css({
 						'width': game.tile * pxLength+'px',
-						'height': game.tile * 4
+						'height': game.tile * 3
 					});
 					
 					if(wall.axis == 'x'){
