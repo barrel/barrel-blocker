@@ -10,7 +10,7 @@
 		tile: 100,
 		speed: 0.1,
 		cameraSpeed: null,
-		framerate: 50,
+		framerate: 58,
 		actualFPS: null,
 		viewingAngle: 50,
 		world: {
