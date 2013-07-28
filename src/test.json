@@ -54,6 +54,51 @@
 					"background" : "#fff"
 				}
 		
+			},
+			{
+				"roomname": "garage",
+				"origin": [5,13],
+				"walls": [
+					{
+						"origin": [0,0],
+						"axis": "y",
+						"length": 4,
+						"background": "red"
+					},
+					{
+						"origin": [0,4],
+						"axis": "x",
+						"length": 10,
+						"background": "red"
+					},
+					{
+						"origin": [10,4],
+						"axis": "y",
+						"length": -8,
+						"background": "red"
+					},
+					{
+						"origin": [10,-4],
+						"axis": "x",
+						"length": -2,
+						"background": "red"
+					},
+					{
+						"origin": [8,-4],
+						"axis": "y",
+						"length": 4,
+						"background": "red"
+					},
+					{
+						"origin": [8,0],
+						"axis": "x",
+						"length": -8,
+						"background": "red"
+					}
+				],
+				"floor": {
+					"background": "red"
+				}
 			}
 		]
 		

@@ -74,29 +74,37 @@
 		*/
 
 		getLevelData: function(url){
-			$.getJSON(url, function(data){
-				game.levelData = data.level;
-				game.prefix = game.getPrefix();
-				game.tile = typeof game.levelData.tile !== 'undefined' ? game.levelData.tile : game.tile;
-				game.world.width = game.tile * game.levelData.world.width;
-				game.world.length = game.tile * game.levelData.world.length;
-				game.player = {
-					x: game.levelData.startPos[0],
-					y: game.levelData.startPos[1]
-				};
-				game.camera = {
-					x: game.tile * ((game.levelData.world.width / 2) - game.player.x),
-					y: -game.tile * ((game.levelData.world.length / 2) - game.player.y)
-				};
-				game.cameraSpeed = game.speed * game.tile;
-				game.moveCamera();
-				game.$world.css({
-					width: game.world.width+'px',
-					height: game.world.length+'px',
-					margin: (game.world.length / -2)+'px 0 0 '+(game.world.width / -2)+'px'
-				});
-				
-				game.renderEnvironment();
+			$.ajax({
+				dataType: "json",
+				url: url,
+				success: function(data){
+					game.levelData = data.level;
+					game.prefix = game.getPrefix();
+					game.tile = typeof game.levelData.tile !== 'undefined' ? game.levelData.tile : game.tile;
+					game.world.width = game.tile * game.levelData.world.width;
+					game.world.length = game.tile * game.levelData.world.length;
+					game.player = {
+						x: game.levelData.startPos[0],
+						y: game.levelData.startPos[1]
+					};
+					game.camera = {
+						x: game.tile * ((game.levelData.world.width / 2) - game.player.x),
+						y: -game.tile * ((game.levelData.world.length / 2) - game.player.y)
+					};
+					game.cameraSpeed = game.speed * game.tile;
+					game.moveCamera();
+					game.$world.css({
+						width: game.world.width+'px',
+						height: game.world.length+'px',
+						margin: (game.world.length / -2)+'px 0 0 '+(game.world.width / -2)+'px'
+					});
+
+					game.renderEnvironment();
+				},
+				error: function(error){
+					alert('JSON PARSE ERROR!');
+					console.info(error)
+				}
 			});
 		},
 		
@@ -207,7 +215,7 @@
 							],
 							rows = [];
 						
-						for(currentTile[1] = 0; currentTile[1]<wall.length; currentTile[1]++){
+						for(currentTile[1] = wall.origin[1]; currentTile[1]<wall.origin[1]+wall.length; currentTile[1]++){
 							var row = [];
 
 							row.push([currentTile[0],currentTile[1]]);
@@ -343,6 +351,7 @@
 				x: game.levelData.startPos[0],
 				y: game.levelData.startPos[1]
 			};
+			game.currentRoom = game.detectRoom(game.player);
 			
 			game.$player.css({
 				width: game.tile+'px',
@@ -435,7 +444,7 @@
 				newCameraPos.x = game.camera.x - game.cameraSpeed;
 			};
 			
-			// DETECT COLLISIONS
+			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
 			var collision = game.detectCollision(newPlayerPos);
 				
@@ -537,7 +546,7 @@
 
 		play: function(){
 			
-			alert('Welcome to Barrelblocker! - Use WASD to move.')
+			//alert('Welcome to Barrelblocker! - Use WASD to move.')
 			console.info(game)
 			
 			var refreshHud = setInterval(function(){
