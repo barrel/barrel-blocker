@@ -74,7 +74,15 @@ body {
 	border: 1px solid #000;
 	
 	&.x-plane{
-		opacity: .5
+		-webkit-filter: brightness(80%);
+	}
+	
+	&.y-plane{
+		
+		
+		&.negative{
+			-webkit-filter: brightness(60%);
+		}
 	}
 }
 
