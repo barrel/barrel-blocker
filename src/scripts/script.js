@@ -101,7 +101,6 @@
 						x: game.tile * ((game.levelData.world.width / 2) - game.characters.player.x),
 						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
 					};
-					game.cameraSpeed = game.speed * game.tile;
 					
 					var cameraTransform = game.getTransformCSS(game.camera, 'rotateX('+game.viewingAngle+'deg)');
 					
@@ -453,16 +452,16 @@
 			
 			if(direction == 'up'){
 				newPlayerPos.y = (game.characters.player.y + game.speed).toFixed(1) * 1;
-				newCameraPos.y = game.camera.y + game.cameraSpeed;
+				newCameraPos.y = (game.camera.y + (game.speed * game.tile)).toFixed(1) * 1;
 			} else if(direction == 'down'){
 				newPlayerPos.y = (game.characters.player.y - game.speed).toFixed(1) * 1;
-				newCameraPos.y = game.camera.y - game.cameraSpeed;
+				newCameraPos.y = (game.camera.y - (game.speed * game.tile)).toFixed(1) * 1;
 			} else if(direction == 'left'){
 				newPlayerPos.x = (game.characters.player.x - game.speed).toFixed(1) * 1;
-				newCameraPos.x = game.camera.x + game.cameraSpeed;
+				newCameraPos.x = (game.camera.x + (game.speed * game.tile)).toFixed(1) * 1;
 			} else if(direction == 'right'){
 				newPlayerPos.x = (game.characters.player.x + game.speed).toFixed(1) * 1;
-				newCameraPos.x = game.camera.x - game.cameraSpeed;
+				newCameraPos.x = (game.camera.x - (game.speed * game.tile)).toFixed(1) * 1;
 			};
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
