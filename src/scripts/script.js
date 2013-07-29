@@ -35,6 +35,7 @@
 			},
 			npcs: []
 		},
+		moveables: {},
 		currentRoom: null,
 		collisionMatrix: {
 			x: {},
@@ -166,21 +167,18 @@
 						rotate = {};
 						
 					$wall.css({
-						'width': game.tile * pxLength+'px',
-						'height': game.tile * 3
+						width: game.tile * pxLength+'px',
+						height: game.tile * 3,
+						marginBottom: -(game.tile * 3)+'px'
 					});
 					
 					if(wall.axis == 'x'){
 						translate.x = (wall.origin[0] + wall.length) * game.tile;
 						translate.y = -wall.origin[1] * game.tile;
-						rotate = negative ? 'rotateX(90deg) rotateY(0deg)':
-						 					'rotateX(90deg) rotateY(180deg)';
 						rotate = negative ? {x: 90, y: 0, z: 0} : {x: 90, y: 180, z: 0};
 					} else {
 						translate.x = wall.origin[0] * game.tile;
 						translate.y = -(wall.origin[1] + wall.length) * game.tile;
-						rotate = negative ? 'rotateX(90deg) rotateY(270deg)':
-						 					'rotateX(90deg) rotateY(90deg)';
 						rotate = negative ? {x: 90, y: 270, z: 0} : {x: 90, y: 90, z: 0};
 					};
 					
@@ -193,35 +191,7 @@
 					
 					// ADD TO COLLISION MATRIX
 					
-					var absoluteOrigin = [
-							wall.origin[0] + room.origin[0],
-							wall.origin[1] + room.origin[1]
-						],
-						collideWith = wall.axis == 'x' ? 'y' : 'x',
-						axisPos = wall.axis == 'x' ? 1 : 0,
-						perpAxisPos = wall.axis == 'x' ? 0 : 1;
-					
-					if(typeof game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] === 'undefined'){
-						game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] = [];
-					};
-					
-					var entry = game.collisionMatrix[collideWith][absoluteOrigin[axisPos]],
-						perpStart = absoluteOrigin[perpAxisPos],
-						perpEnd = absoluteOrigin[perpAxisPos] + wall.length,
-						collisionObject = {
-							objectType: wall.portal ? 'portal' : 'wall',
-							collide: wall.portal ? false : true,
-							domNode: $wall[0]
-						};
-						
-						if(wall.portal){
-							collisionObject.open = false;
-						};
-						
-					collisionObject[wall.axis+'Min'] = perpStart > perpEnd ? perpEnd : perpStart;
-					collisionObject[wall.axis+'Max'] = perpStart > perpEnd ? perpStart : perpEnd;
-					
-					entry.push(collisionObject);
+					game.pushCollision($wall, wall, room);
 					
 					// MAP FLOOR TILES
 					
@@ -289,9 +259,11 @@
 						
 				});
 				
+				game.renderFurniture(room)
+				
 			});
 			
-			game.renderFurniture();
+			game.renderChars();
 		},
 		
 		/*
@@ -339,15 +311,38 @@
 		
 		/*
 		*	RENDER FURNITURE
+		* 	@args: room / parent room object
 		*
 		*	Renders 2D & 3D furniture objects and adds to collision matrix.		
 		*/
 
-		renderFurniture: function(){
+		renderFurniture: function(room){
 			
-			// EMPTY
+			var $room = (game.rooms[room.roomname].domNode);
 			
-			game.renderChars();
+			if(room.furniture){
+				$.each(room.furniture, function(){
+					
+					var furn = this;
+					
+					$furn = $('<div class="furniture '+furn.objectClass+'" id="'+furn.objectName+'"/>').appendTo($room);
+					
+					if(furn.shape == 'cuboid'){
+						var collisions = game.buildCuboid($furn, furn, room);
+					};
+					
+					if(furn.moveable){
+						game.moveables[furn.objectName] = {
+							domObj: $furn[0],
+							origin: furn.origin,
+							collisions: collisions
+						}
+					};
+					
+					
+				});
+			};	
+			
 		},
 		
 		/*
@@ -430,6 +425,56 @@
 		},
 		
 		/*
+		*	DRAW
+		*
+		*	Global front-end redraw function
+		*/
+
+		draw: function(){
+
+			var startFrame = new Date().getTime(),
+				refresh = setInterval(function(){
+
+				// REDRAW PLAYER
+
+				var playerTransform = game.getTransformCSS(game.$player.data('translate'));
+
+				game.$player.css(playerTransform);
+
+				// REDRAW NPCs
+
+				// REDRAW MOVEABLE OBJECTS
+				
+				$.each(game.moveables, function(key, value){
+					var $moveable = $(value.domObj),
+					 	moveableTransform = game.getTransformCSS($moveable.data('translate'));
+
+					$moveable.css(moveableTransform);
+				});
+
+				// REDRAW CAMERA
+
+				var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
+
+				game.$world.css(cameraTransform);
+
+				// UPDATE HUD
+
+				$('#RoomName').text(game.currentRoom.roomname);
+				$('#FPS').text(game.actualFPS+'fps');
+
+				// GET FRAMERATE
+
+				var endFrame = new Date().getTime(),
+					frameDuration = endFrame - startFrame;
+					game.actualFPS = (1000/frameDuration).toFixed(1);
+					startFrame = endFrame;
+
+			},1000/game.framerate);
+
+		},
+		
+		/*
 		*	MOVE
 		*	@arg: direction / string
 		*	
@@ -498,6 +543,50 @@
 					doorTransform = game.getTransformCSS(doorTranslate, {x: doorRotate.x, y: doorAngle, z: doorRotate.z});
 						
 					$door.css(doorTransform);
+				};
+				
+				// IF MOVEABLE OBJECT - IN PROGRESS!
+				
+				if(collision.object.moveable){
+					var $moveable = $('#'+collision.object.parent),
+						moveable = game.moveables[collision.object.parent],
+						moveableTranslate = $moveable.data('translate');
+						
+					if(direction == 'right'){
+						
+						// SHUNT OBJECT
+						
+						moveable.origin[0] = (moveable.origin[0] + game.speed);
+						$.extend(moveableTranslate, {x: moveableTranslate.x + (game.speed * game.tile)});
+						
+						// UPDATE COLLISIONS
+						
+						$.each(moveable.collisions,function(i){
+							if(this[0] == 'x'){
+								var entry = game.collisionMatrix[this[0]][this[1]][this[2]],
+									newVal = (this[1]+game.speed.toFixed(1)) * 1;
+								if(typeof game.collisionMatrix[this[0]][newVal] == 'undefined'){
+									game.collisionMatrix[this[0]][newVal] = [];
+								};
+							
+								game.collisionMatrix[this[0]][this[1]].splice(this[2],1);
+								game.collisionMatrix[this[0]][newVal].push(entry);
+								if(!game.collisionMatrix[this[0]][this[1]].length){
+									delete game.collisionMatrix[this[0]][this[1]];
+								};
+							
+								moveable.collisions[i][1] = newVal;
+							
+							
+							} else {
+								//update min and max vals for perpendicular plane
+							}
+							
+							// will need to update collisions with new indices;
+						});
+					};
+					
+					$moveable.data('translate', moveableTranslate);
 				};
 			};
 		},
@@ -590,49 +679,6 @@
 		},
 		
 		/*
-		*	DRAW
-		*
-		*	Global front-end redraw function
-		*/
-		
-		draw: function(){
-			
-			var startFrame = new Date().getTime(),
-				refresh = setInterval(function(){
-				
-				// REDRAW PLAYER
-				
-				var playerTransform = game.getTransformCSS(game.$player.data('translate'));
-				
-				game.$player.css(playerTransform);
-				
-				// REDRAW NPCs
-				
-				
-				
-				// REDRAW CAMERA
-				
-				var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
-
-				game.$world.css(cameraTransform);
-				
-				// UPDATE HUD
-				
-				$('#RoomName').text(game.currentRoom.roomname);
-				$('#FPS').text(game.actualFPS+'fps');
-				
-				// GET FRAMERATE
-				
-				var endFrame = new Date().getTime(),
-					frameDuration = endFrame - startFrame;
-					game.actualFPS = (1000/frameDuration).toFixed(1);
-					startFrame = endFrame;
-				
-			},1000/game.framerate);
-			
-		},
-		
-		/*
 		*	GET TRANSFORM CSS
 		*	@arg: translate / Object (xyz)
 		*	@arg: rotate / Object (xyz)
@@ -643,10 +689,12 @@
 		
 		getTransformCSS: function(translate, rotate){
 			rotate = rotate ? rotate : {x: 0, y: 0, z: 0};
+			translate = translate.z ? translate : {x: translate.x, y: translate.y, z: 0};
+
 			var styles = {};
 			for(var i = 0; i < 2; i++){
 				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, 0) rotateX('+rotate.x+'deg) rotateY('+rotate.y+'deg) rotateZ('+rotate.z+'deg)';
+				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, '+translate.z+'px) rotateX('+rotate.x+'deg) rotateY('+rotate.y+'deg) rotateZ('+rotate.z+'deg)';
 			};
 			return styles;
 		},
@@ -680,6 +728,139 @@
 				x: pixelX.toFixed() * 1,
 				y: -pixelY.toFixed() * 1
 			};
+		},
+		
+		buildCuboid: function($cuboid, cuboid, room){
+			var cuboidPos = game.positionInPixels(cuboid);
+			$.extend(cuboidPos, {
+				z: (cuboid.dimensions[2] * game.tile)
+			});
+		
+			$cuboid.data('translate',cuboidPos);
+			
+			cuboidTransform = game.getTransformCSS(cuboidPos);
+
+			$cuboid.css({
+				width: (cuboid.dimensions[0] * game.tile)+'px',
+				height: (cuboid.dimensions[1] * game.tile)+'px',
+				background: cuboid.skin.top
+			}).css(cuboidTransform);
+			
+			var verticalFaces = [
+				{
+					face: 'left',
+					length: cuboid.dimensions[1],
+					origin: [0,0],
+					axis: 'y'
+				},
+				{
+					face: 'back',
+					length: cuboid.dimensions[0],
+					origin: [0,cuboid.dimensions[1]],
+					axis: 'x'
+				},
+				{
+					face: 'right',
+					length: -cuboid.dimensions[1],
+					origin: [cuboid.dimensions[0],cuboid.dimensions[1]],
+					axis: 'y',
+					negative: true
+				},
+				{
+					face: 'bottom',
+					length: -cuboid.dimensions[0],
+					origin: [cuboid.dimensions[0],0],
+					axis: 'x',
+					negative: true
+				}
+			];
+			
+			var collisions = [];
+			
+			$.each(verticalFaces, function(i){
+				var face = this,
+					$face = $('<div class="face '+face.axis+'-plane'+(face.negative ? ' negative' : '')+'"/>').appendTo($cuboid),
+					width = face.negative ? -face.length : face.length,
+					translate = {z: -cuboid.dimensions[2] * game.tile},
+					rotate = {};
+					
+					if(face.axis == 'x'){
+						translate.x = face.origin[0] * game.tile;
+						translate.y = (verticalFaces[0].length - face.origin[1]) * game.tile;
+						rotate = face.negative ? {x: 90, y: 180, z: 0} : {x: 90, y: 0, z: 0};
+					} else {
+						translate.x = face.origin[0] * game.tile;
+						translate.y = (face.origin[1] + face.length) * game.tile;
+						rotate = face.negative ? {x: 90, y: 90, z: 0} : {x: 90, y: 270, z: 0};
+					};
+
+					$face.data('translate',translate);
+					$face.data('rotate',rotate);
+
+					var faceTransform = game.getTransformCSS(translate, rotate);	
+
+					$face.css({
+						width: (width * game.tile)+'px',
+						height: (cuboid.dimensions[2] * game.tile)+'px',
+						marginBottom: ((cuboid.dimensions[1] - cuboid.dimensions[2]) * game.tile)+'px',
+						background: cuboid.skin[face.face]
+					}).css(faceTransform);
+					
+					// ADD TO COLLISION MATRIX
+					
+					collisions.push(game.pushCollision($face, face, cuboid, room, $cuboid[0]));
+				
+			});
+			
+			return collisions;
+
+		},
+		
+		/*
+		*	PUSH COLLISION
+		*	@arg: $plane / jQuery object
+		*	@arg: plane / levelData object
+		*	@arg: parent / parent levelData object
+		*	@arg: parent / grandparent levelData object
+		*
+		*	Pushes plane into collision matrix.
+		*/
+		
+		pushCollision: function($plane, plane, parent, grandparent, parentDomNode){
+			grandparent = grandparent ? grandparent : {origin: [0,0]};
+			var absoluteOrigin = [
+					plane.origin[0] + parent.origin[0] + grandparent.origin[0],
+					plane.origin[1] + parent.origin[1] + grandparent.origin[1]
+				],
+				collideWith = plane.axis == 'x' ? 'y' : 'x',
+				axisPos = plane.axis == 'x' ? 1 : 0,
+				perpAxisPos = plane.axis == 'x' ? 0 : 1;
+		
+			if(typeof game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] === 'undefined'){
+				game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] = [];
+			};
+		
+			var entry = game.collisionMatrix[collideWith][absoluteOrigin[axisPos]],
+				perpStart = absoluteOrigin[perpAxisPos],
+				perpEnd = absoluteOrigin[perpAxisPos] + plane.length,
+				collisionObject = {
+					objectType: plane.portal ? 'portal' : 'plane',
+					collide: plane.portal ? false : true,
+					domNode: $plane[0],
+					moveable: parent.moveable ? true : false,
+					parent: parent.objectName
+				};
+			
+				if(plane.portal){
+					collisionObject.open = false;
+				};
+			
+			collisionObject[plane.axis+'Min'] = perpStart > perpEnd ? perpEnd : perpStart;
+			collisionObject[plane.axis+'Max'] = perpStart > perpEnd ? perpStart : perpEnd;
+		
+			var entryIndex = entry.push(collisionObject) -1;
+			
+			return [collideWith,absoluteOrigin[axisPos],entryIndex];
 		},
 		
 		/*
