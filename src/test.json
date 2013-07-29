@@ -6,7 +6,7 @@
 			"width": 20,
 			"length": 20
 		},
-		"startPos": [10,7],
+		"startPos": [10,8],
 		"rooms": [
 			{
 				"roomname": "office",
@@ -103,7 +103,8 @@
 						"origin": [10,0],
 						"axis": "y",
 						"length": -4,
-						"background": "red"
+						"background": "red",
+						"backfaceVisible": true
 					},
 					{
 						"origin": [10,-4],

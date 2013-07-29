@@ -135,18 +135,16 @@
 				// CREATE ROOM
 				
 				var room = this,
-					$room = $('<div class="room" id="'+room.roomname+'"/>').appendTo(game.$world);
+					$room = $('<div class="room" id="'+room.roomname+'"/>').appendTo(game.$world),
+					roomPos = {
+						x: game.tile * room.origin[0],
+						y: -(game.tile * room.origin[1])
+					};
 					
 				// POSITION ROOM
 					
-				var styles = {};
-				
-				for(var i = 0; i < 2; i++){
-					var prefix = i == 0 ? game.prefix : '';
-					styles[prefix+'transform'] = 'translate3d('+game.tile * room.origin[0]+'px, '+(game.world.length - (game.tile * room.origin[1]))+'px, 0)';
-				};
-			
-				$room.css(styles);
+				var roomTransform = game.getTransformCSS(roomPos);
+				$room.css(roomTransform);
 				
 				// BUILD ROOM OBJECT
 				
@@ -328,17 +326,12 @@
 					yMax: absOrigin[1] + quad.height
 				});
 				
-				var styles = {};
-
-				for(var i = 0; i < 2; i++){
-					var prefix = i == 0 ? game.prefix : '';
-					styles[prefix+'transform'] = 'translate3d('+pos.x+'px, '+pos.y+'px, 0px)';
-				};
+				var floorTileTransform = game.getTransformCSS(pos);
 
 				$floorTile.css({
 					width: game.tile * quad.width+'px',
 					height: game.tile * quad.height+'px'
-				}).css(styles);
+				}).css(floorTileTransform);
 				
 			});
 			
@@ -639,6 +632,15 @@
 			
 		},
 		
+		/*
+		*	GET TRANSFORM CSS
+		*	@arg: translate / Object (xyz)
+		*	@arg: rotate / Object (xyz)
+		*	return style object for use with .css()
+		*
+		*	Converts translate and rotate values into prefixed and unprefixed transform string
+		*/
+		
 		getTransformCSS: function(translate, rotate){
 			rotate = rotate ? rotate : {x: 0, y: 0, z: 0};
 			var styles = {};
@@ -672,7 +674,7 @@
 		
 		positionInPixels: function(obj){
 			var pixelX = obj.origin[0] * game.tile,
-				pixelY = (obj.origin[1] * game.tile) + (obj.height * game.tile);
+				pixelY = (obj.origin[1] * game.tile);
 				
 			return {
 				x: pixelX.toFixed() * 1,
