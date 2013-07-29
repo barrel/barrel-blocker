@@ -6,7 +6,7 @@
 @grid: 100px;
 
 * {
-	.box-sizing(border-box);
+	//.box-sizing(border-box);
 	.no-smoothing;
 }
 
@@ -20,6 +20,8 @@ body {
 	.perspective(@perspective);
 	.perspective-origin(50%, 0%);
 	.transition(250ms);
+	
+	background: #000;
 
 	&.fade {
 		&:after {
@@ -30,72 +32,145 @@ body {
 	}
 }
 
-#room {
+#HUD{
 	position: absolute;
-	top: 0; left: 50%;
-	width: @grid;
-	height: @grid;
-	margin-left: (@grid * -5);
-	.transform-style(preserve-3d);
-	.transform(translate3d(0, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
-
-	&.panning {
-		.animation(camera-pan 3s linear infinite alternate);
-	}
+	left: 0;
+	right: 0;
+	height: 50px;
+	line-height: 10px;
+	padding: 20px;
+	background: rgba(0,0,0,.4);
+	color: #fff;
+	font-family: 'Helvetica Neue';
+	font-weight: 300;
+	
+	.just();
 }
 
-.wall {
+#World{
 	position: absolute;
-	height: (@grid * 4);
-
-	&.east {
-		.transform-origin(100%, 50%);
-	}
-
-	&.west {
-		.transform-origin(0%, 50%);
-	}
-
-	&.north {
-		.transform-origin(100%, 50%);
-	}
-
-	&.south {
-		.transform-origin(0%, 50%);
-	}
-
-}
-
-.floor {
-	position: absolute;
-	top: (@grid * 4); left: 0;
-	height: 800px;
-	width: 1000px;
-	.transform-origin(50%,0%);
-	.transform(translate3d(0, 0, (@grid * -4)) rotateX(90deg));
+	left: 50%;
+	top: 50%;
+	
 	.transform-style(preserve-3d);
 }
 
-
-.player {
-	position: absolute;
-	top: 0; left: @grid;
-	width: @grid; height: (@grid * 2);
-	background: gray;
-	.transform-origin(50%,100%);
-	.transform(rotateX(-90deg) translateZ(-100px));
+.x-plane{
+	-webkit-filter: brightness(80%);
 }
 
-@-webkit-keyframes camera-pan { .camera-pan-frames; }
-@-moz-keyframes camera-pan { .camera-pan-frames; }
-@-ms-keyframes camera-pan { .camera-pan-frames; }
-@-o-keyframes camera-pan { .camera-pan-frames; }
-@keyframes camera-pan { .camera-pan-frames; }
-.camera-pan-frames() {
-	from {
-		.transform(translate3d(-200%, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+.y-plane{
+	-webkit-filter: brightness(90%);
+	
+	&.negative{
+		-webkit-filter: brightness(60%);
 	}
-	to {
-		.transform(translate3d(300%, (@grid * 2), (@grid * 2)) rotateX(@viewAngle));
+}
+
+.room{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	
+	.transform-style(preserve-3d);
+}
+
+.wall{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+
+	.transform-origin(0%, 0%);
+	&:not(.backface){
+		.wf();
 	}
+	
+	&.portal{
+		.transition(all 500ms cubic-bezier(0.165, 0.84, 0.44, 1));
+	}
+}
+
+.floortile{
+	position: absolute;
+	padding-top: 1px;
+	left: 0;
+	bottom: 0;
+}
+
+.char{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	
+	.transform-style(preserve-3d);
+}
+
+@playerRotateX: 90deg;
+
+.player{
+	.avatar{
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		margin-left: -@grid/2;
+		width: @grid;
+		height: 2*@grid;
+		background: red;
+		
+		.transition(all 200ms);
+		.transform-origin(50%, 0%);
+		.transform-style(preserve-3d);
+		
+		.transform(rotateX(@playerRotateX));
+		
+	
+		.down&{
+			.transform(rotateX(@playerRotateX) rotateY(180deg));
+		}
+	
+		.right&{
+			.transform(rotateX(@playerRotateX) rotateY(90deg));
+		}
+	
+		.left&{
+			.transform(rotateX(@playerRotateX) rotateY(270deg));
+		}
+	
+		.player[data-room='garage']&{
+			background: #fff;
+		}
+	
+		&:after{
+			content: '';
+			display: block;
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: @grid;
+			height: 0px;
+			border-radius: 100%;
+			background: rgba(0,0,0,.15);
+		
+			box-shadow: 0 0 25px 5px rgba(0,0,0,.6);
+		
+			.transform(rotateX(90deg) translate3d(0, 0, 195px));
+		}
+	}
+}
+
+.furniture,
+.furniture .face{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	background: gold;
+	
+	.transform-style(preserve-3d);
+}
+
+.furniture .face{
+	background: blue;
+	
+	.transform-origin(0%, 0%);	
+	.wf();
 }

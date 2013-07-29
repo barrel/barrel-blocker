@@ -4,21 +4,15 @@
 	<title>Barrel Blocker!</title>
 	<link rel="stylesheet" href="styles/styles.css" />
 	<!-- build:js scripts/script.js -->
-	<script src="bower_components/jquery/jquery.js"></script>
-	<script src="bower_components/handlebars/handlebars.js"></script>
+	<script src="bower_components/jquery/jquery.min.js"></script>
 	<script src="scripts/script.js"></script>
 	<!-- endbuild -->
 </head>
 <body>
-	<div id="room" class="panning">
-		<div class="floor" style="background: brown;">
-			<div class="player"></div>
-		</div>
+	<div id="World"></div>
+	<div id="HUD">
+		<div>You are in the <span id="RoomName"></span></div>
+		<div id="FPS"></div>
 	</div>
-
-	<script id="wallTpl" type="text/template">
-		<div class="wall {{direction}}" style="background: {{background}}; width: {{length}}00px">
-		</div>
-	</script>
 </body>
 </html>
