@@ -1,3 +1,35 @@
+// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+ 
+// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+ 
+// MIT license
+ 
+(function() {
+    var lastTime = 0;
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] 
+                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+ 
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+              timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+ 
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+
 /* --- BARRELBLOCKER ENGINE --- */
 
 (function($){
@@ -8,7 +40,7 @@
 		$player: null,
 		levelData: null,
 		tile: 100,
-		speed: 0.1,
+		speed: 2,
 		cameraSpeed: null,
 		framerate: 58,
 		actualFPS: null,
@@ -55,12 +87,6 @@
 				left: false,
 				right: false
 			}
-		},
-		movements: {
-			up: null,
-			down: null,
-			left: null,
-			right: null
 		},
 		
 		/*
@@ -405,9 +431,10 @@
 					if(!keystates[key]){
 							keystates[key] = true;
 							game.$player.removeClass('up down left right').addClass(key);
-							game.movements[key] = setInterval(function(){
+							game.characters.player.dir = key;
+							/*game.movements[key] = setInterval(function(){
 								game.move(key);
-							},1000/game.framerate);
+					 		},1000/game.framerate);*/
 					};
 				},
 				keyup: function(e){
@@ -415,11 +442,12 @@
 					
 					if(keystates[key]){
 						keystates[key] = false;
-						clearInterval(game.movements[key]);
+						//clearInterval(game.movements[key]);
 					};
 				}
 			});
 			
+			game.updated = new Date().getTime();
 			game.draw();
 			game.play();
 		},
@@ -430,10 +458,18 @@
 		*	Global front-end redraw function
 		*/
 
-		draw: function(){
+		draw: function(time){
 
-			var startFrame = new Date().getTime(),
-				refresh = setInterval(function(){
+			var startFrame = new Date().getTime();
+			
+			// SET REFRESH RATE USING SETTIMEOUT AND REQUESTANIMATIONFRAME
+			
+			//setTimeout(function(){
+				requestAnimationFrame(game.draw);
+
+				// MOVE OBJECTS
+
+				game.move();
 
 				// REDRAW PLAYER
 
@@ -469,20 +505,18 @@
 					frameDuration = endFrame - startFrame;
 					game.actualFPS = (1000/frameDuration).toFixed(1);
 					startFrame = endFrame;
-
-			},1000/game.framerate);
+			//},1000/game.framerate);
 
 		},
 		
 		/*
 		*	MOVE
-		*	@arg: direction / string
 		*	
 		*	Calculates player and camera positions.
 		*	Updates new positions if no collisions.
 		*/
 		
-		move: function(direction){
+		move: function(){
 			
 			var newPlayerPos = {
 					x: game.characters.player.x,
@@ -491,20 +525,27 @@
 				newCameraPos = {
 					x: game.camera.x,
 					y: game.camera.y
-				};
+				},
+				direction = game.characters.player.dir,
+				controls = game.controls.states;
+
+			var elapsed = new Date().getTime() - game.updated;
+			var factor = (elapsed / game.framerate) * game.speed;
 			
-			if(direction == 'up'){
-				newPlayerPos.y = (game.characters.player.y + game.speed).toFixed(1) * 1;
-				newCameraPos.y = (game.camera.y + (game.speed * game.tile)).toFixed(1) * 1;
-			} else if(direction == 'down'){
-				newPlayerPos.y = (game.characters.player.y - game.speed).toFixed(1) * 1;
-				newCameraPos.y = (game.camera.y - (game.speed * game.tile)).toFixed(1) * 1;
-			} else if(direction == 'left'){
-				newPlayerPos.x = (game.characters.player.x - game.speed).toFixed(1) * 1;
-				newCameraPos.x = (game.camera.x + (game.speed * game.tile)).toFixed(1) * 1;
-			} else if(direction == 'right'){
-				newPlayerPos.x = (game.characters.player.x + game.speed).toFixed(1) * 1;
-				newCameraPos.x = (game.camera.x - (game.speed * game.tile)).toFixed(1) * 1;
+			if(controls.up && !controls.down){
+				newPlayerPos.y = (game.characters.player.y + factor).toFixed(1) * 1;
+				newCameraPos.y = (game.camera.y + (factor * game.tile)).toFixed(1) * 1;
+			} else if(controls.down && !controls.up){
+				newPlayerPos.y = (game.characters.player.y - factor).toFixed(1) * 1;
+				newCameraPos.y = (game.camera.y - (factor * game.tile)).toFixed(1) * 1;
+			};
+			
+			if(controls.left && !controls.right){
+				newPlayerPos.x = (game.characters.player.x - factor).toFixed(1) * 1;
+				newCameraPos.x = (game.camera.x + (factor * game.tile)).toFixed(1) * 1;
+			} else if(controls.right && !controls.left){
+				newPlayerPos.x = (game.characters.player.x + factor).toFixed(1) * 1;
+				newCameraPos.x = (game.camera.x - (factor * game.tile)).toFixed(1) * 1;
 			};
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
@@ -513,7 +554,6 @@
 				
 			if(!collision.collided || collision.collided && collision.object.objectType == 'portal'){
 				$.extend(game.characters.player,{
-					dir: direction,
 					x: newPlayerPos.x,
 					y: newPlayerPos.y
 				});
@@ -556,23 +596,25 @@
 						
 						// SHUNT OBJECT
 						
-						moveable.origin[0] = (moveable.origin[0] + game.speed);
+						moveable.origin[0] = (moveable.origin[0] + factor);
 						$.extend(moveableTranslate, {x: moveableTranslate.x + (game.speed * game.tile)});
 						
 						// UPDATE COLLISIONS
 						
-						$.each(moveable.collisions,function(i){
-							if(this[0] == 'x'){
-								var entry = game.collisionMatrix[this[0]][this[1]][this[2]],
-									newVal = (this[1]+game.speed.toFixed(1)) * 1;
-								if(typeof game.collisionMatrix[this[0]][newVal] == 'undefined'){
-									game.collisionMatrix[this[0]][newVal] = [];
+						for(var i = 0; i < moveable.collisions.length; i++){
+							var self = moveable.collisions[i];
+
+							if(self[0] == 'x'){
+								var entry = game.collisionMatrix[self[0]][self[1]][self[2]],
+									newVal = (self[1]+game.speed.toFixed(1)) * 1;
+								if(typeof game.collisionMatrix[self[0]][newVal] == 'undefined'){
+									game.collisionMatrix[self[0]][newVal] = [];
 								};
 							
-								game.collisionMatrix[this[0]][this[1]].splice(this[2],1);
-								game.collisionMatrix[this[0]][newVal].push(entry);
-								if(!game.collisionMatrix[this[0]][this[1]].length){
-									delete game.collisionMatrix[this[0]][this[1]];
+								game.collisionMatrix[self[0]][self[1]].splice(self[2],1);
+								game.collisionMatrix[self[0]][newVal].push(entry);
+								if(!game.collisionMatrix[self[0]][self[1]].length){
+									delete game.collisionMatrix[self[0]][self[1]];
 								};
 							
 								moveable.collisions[i][1] = newVal;
@@ -583,12 +625,14 @@
 							}
 							
 							// will need to update collisions with new indices;
-						});
+						}
 					};
 					
 					$moveable.data('translate', moveableTranslate);
 				};
 			};
+
+			game.updated = new Date().getTime();
 		},
 		
 		/*
@@ -660,8 +704,8 @@
 		
 		detectRoom: function(position){
 			var index = null
-			$.each(game.floorTiles, function(i){
-				floorTile = this;
+			for(var i = 0; i < game.floorTiles.length; i++) {
+				floorTile = game.floorTiles[i];
 				if(
 					game.characters.player.x >= floorTile.xMin &&
 					game.characters.player.x <= floorTile.xMax &&
@@ -670,7 +714,7 @@
 				){
 					index = i;
 				}
-			});
+			}
 			
 			return {
 				roomname: game.floorTiles[index].parentRoom,
