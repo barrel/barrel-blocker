@@ -573,8 +573,8 @@
 						
 						// UPDATE COLLISIONS
 						
-						$.each(moveable.collisions,function(i){
-							var indices = this,
+						for(var i = 0; i < moveable.collisions.length; i++){
+							var indices = moveable.collisions[i],
 								axis = indices[0],
 								collideAt = indices[1],
 								entryIndex = indices[2],
