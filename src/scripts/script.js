@@ -8,7 +8,7 @@
 		$player: null,
 		levelData: null,
 		tile: 100,
-		speed: 1,
+		speed: 1.3,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
@@ -432,7 +432,7 @@
 			
 			// SET REFRESH RATE USING SETTIMEOUT AND REQUESTANIMATIONFRAME
 			
-			setTimeout(function(){
+			//setTimeout(function(){
 				requestAnimationFrame(game.draw);
 
 				// MOVE OBJECTS
@@ -473,7 +473,7 @@
 					frameDuration = endFrame - startFrame;
 					game.actualFPS = (1000/frameDuration).toFixed(1);
 					startFrame = endFrame;
-			},1000/game.framerate);
+			//},1000/game.framerate);
 
 		},
 		
