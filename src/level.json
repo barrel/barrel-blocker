@@ -69,7 +69,7 @@
 					
 				],
 				"floor": {
-					"background" : "gray"
+					"background" : "url(images/floor.gif)"
 				},
 				"furniture": [
 					{
