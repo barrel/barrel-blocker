@@ -12,7 +12,7 @@
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		viewingAngle: 30,
+		viewingAngle: 45,
 		world: {
 			width: null,
 			height: null
@@ -156,7 +156,7 @@
 						negative = -wall.length > 0 ? true : false,
 						className = (negative ? ' negative' : '') + (wall.backfaceVisible ? ' backface' : '') + (wall.portal ? ' portal' : ''),
 						pxLength = negative ? -wall.length : wall.length,
-						$wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background-color: '+wall.background+'"/>').appendTo($room),
+						$wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background: '+wall.background+'"/>').appendTo($room),
 						translate = {},
 						rotate = {};
 						
@@ -465,7 +465,7 @@
 				// UPDATE HUD
 
 				$('#RoomName').text(game.currentRoom.roomname);
-				$('#FPS').text(game.actualFPS+'fps');
+				//$('#FPS').text(game.actualFPS+'fps');
 
 				// GET FRAMERATE
 
@@ -728,7 +728,7 @@
 
 		play: function(){
 			
-			alert('Welcome to Barrelblocker! - Use WASD to move.');
+			//alert('Welcome to Barrelblocker! - Use WASD to move.');
 			console.info(game);
 
 		},
@@ -921,5 +921,5 @@
 /* --- DOM READY --- */
 
 $(function() {
-	$('#World').barrelBlocker('test.json');
+	$('#World').barrelBlocker('level.json');
 });

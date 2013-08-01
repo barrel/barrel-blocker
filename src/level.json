@@ -1,44 +1,172 @@
 {
 	"level": {
-		"walls": [
+		"title": "The Office",
+		"tile": 100,
+		"world": {
+			"width": 20,
+			"length": 20
+		},
+		"startPos": [10,5],
+		"rooms": [
 			{
-				"direction": "west",
-				"length": "4",
-				"background": "red"
+				"roomname": "office",
+				"origin": [5,5],
+				"walls": [
+					{
+						"origin": [0,0],
+						"axis": "y",
+						"length": 8,
+						"background": "url(images/brick.gif)"
+					},
+					{
+						"origin": [0,8],
+						"axis": "x",
+						"length": 8,
+						"background": "url(images/brick.gif)"
+					},
+					{
+						"origin": [8,8],
+						"axis": "y",
+						"length": -4,
+						"background": "url(images/brick.gif)"
+					},
+					{
+						"origin": [8,4],
+						"axis": "x",
+						"length": 0.5,
+						"background": "url(images/brick.gif)"
+					},
+					{
+						"origin": [8.5,4],
+						"axis": "x",
+						"length": 1,
+						"background": "url(images/brick.gif)",
+						"portal": true,
+						"backfaceVisible": true
+					},
+					{
+						"origin": [9.5,4],
+						"axis": "x",
+						"length": 0.5,
+						"background": "url(images/brick.gif)"
+					},
+					{
+						"origin": [10,4],
+						"axis": "y",
+						"length": -4,
+						"background": "url(images/brick.gif)"
+					},
+					{
+						"origin": [10,0],
+						"axis": "x",
+						"length": -10,
+						"background": "white",
+						"backfaceVisible": true
+					}
+					
+				],
+				"floor": {
+					"background" : "#fff"
+				},
+				"furniture": [
+					{
+						"objectClass": "table",
+						"objectName": "KitchenTable",
+						"shape": "cuboid",
+						"moveable": false,
+						"dimensions": [4,1,1],
+						"origin": [2,2],
+						"skin": {
+							"top": "gold",
+							"left": "gold",
+							"back": "gold",
+							"right": "gold",
+							"bottom": "gold"
+						}
+					},
+					{
+						"objectClass": "stool",
+						"objectName": "Stool1",
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.5,0.5,0.5],
+						"origin": [4,1],
+						"skin": {
+							"top": "#F7468A",
+							"left": "#F7468A",
+							"back": "#F7468A",
+							"right": "#F7468A",
+							"bottom": "#F7468A"
+						}
+					}
+				]
 			},
 			{
-				"direction": "north",
-				"length": "8",
-				"background": "blue"
-			},
-			{
-				"direction": "east",
-				"length": "4",
-				"background": "yellow"
-			},
-			{
-				"direction": "north",
-				"length": "2",
-				"background": "green"
-			},
-			{
-				"direction": "east",
-				"length": "4",
-				"background": "yellow"
-			},
-			{
-				"direction": "south",
-				"length": "10",
-				"background": "none"
-			},
-			{
-				"direction": "west",
-				"length": "4",
-				"background": "red"
+				"roomname": "garage",
+				"origin": [5,13],
+				"walls": [
+					{
+						"origin": [0,0],
+						"axis": "y",
+						"length": 4,
+						"background": "red"
+					},
+					{
+						"origin": [0,4],
+						"axis": "x",
+						"length": 14,
+						"background": "red"
+					},
+					{
+						"origin": [14,4],
+						"axis": "y",
+						"length": -4,
+						"background": "red"
+					},
+					{
+						"origin": [14,0],
+						"axis": "x",
+						"length": -4,
+						"background": "red",
+						"backfaceVisible": true
+					},
+					{
+						"origin": [10,0],
+						"axis": "y",
+						"length": -4,
+						"background": "red",
+						"backfaceVisible": true
+					},
+					{
+						"origin": [10,-4],
+						"axis": "x",
+						"length": -0.5,
+						"background": "red"
+					},
+					{
+						"origin": [8.5,-4],
+						"axis": "x",
+						"length": -0.5,
+						"background": "red"
+					},
+					{
+						"origin": [8,-4],
+						"axis": "y",
+						"length": 4,
+						"background": "red"
+					},
+					{
+						"origin": [8,0],
+						"axis": "x",
+						"length": -8,
+						"background": "red"
+					}
+				],
+				"floor": {
+					"background": "red"
+				}
 			}
-		],
-		"floor": {
-			"background": "url(brick.png)"
-		}
+		]
+		
 	}
 }
