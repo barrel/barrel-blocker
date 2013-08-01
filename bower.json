@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "dependencies": {
     "rAF-polyfill": "https://gist.github.com/1579671.git",
-    "handlebars": "~1.0.0",
     "jquery": "~2.0.3"
   }
 }
