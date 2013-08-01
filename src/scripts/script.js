@@ -8,9 +8,9 @@
 		$player: null,
 		levelData: null,
 		tile: 100,
-		speed: 0.1,
+		speed: 1.3,
 		cameraSpeed: null,
-		framerate: 58,
+		framerate: 60,
 		actualFPS: null,
 		viewingAngle: 30,
 		world: {
@@ -55,12 +55,6 @@
 				left: false,
 				right: false
 			}
-		},
-		movements: {
-			up: null,
-			down: null,
-			left: null,
-			right: null
 		},
 		
 		/*
@@ -405,9 +399,10 @@
 					if(!keystates[key]){
 							keystates[key] = true;
 							game.$player.removeClass('up down left right').addClass(key);
-							game.movements[key] = setInterval(function(){
+							game.characters.player.dir = key;
+							/*game.movements[key] = setInterval(function(){
 								game.move(key);
-							},1000/game.framerate);
+					 		},1000/game.framerate);*/
 					};
 				},
 				keyup: function(e){
@@ -415,11 +410,12 @@
 					
 					if(keystates[key]){
 						keystates[key] = false;
-						clearInterval(game.movements[key]);
+						//clearInterval(game.movements[key]);
 					};
 				}
 			});
 			
+			game.updated = new Date().getTime();
 			game.draw();
 			game.play();
 		},
@@ -430,10 +426,18 @@
 		*	Global front-end redraw function
 		*/
 
-		draw: function(){
+		draw: function(time){
 
-			var startFrame = new Date().getTime(),
-				refresh = setInterval(function(){
+			var startFrame = new Date().getTime();
+			
+			// SET REFRESH RATE USING SETTIMEOUT AND REQUESTANIMATIONFRAME
+			
+			//setTimeout(function(){
+				requestAnimationFrame(game.draw);
+
+				// MOVE OBJECTS
+
+				game.move();
 
 				// REDRAW PLAYER
 
@@ -469,20 +473,18 @@
 					frameDuration = endFrame - startFrame;
 					game.actualFPS = (1000/frameDuration).toFixed(1);
 					startFrame = endFrame;
-
-			},1000/game.framerate);
+			//},1000/game.framerate);
 
 		},
 		
 		/*
 		*	MOVE
-		*	@arg: direction / string
 		*	
 		*	Calculates player and camera positions.
 		*	Updates new positions if no collisions.
 		*/
 		
-		move: function(direction){
+		move: function(){
 			
 			var newPlayerPos = {
 					x: game.characters.player.x,
@@ -491,20 +493,28 @@
 				newCameraPos = {
 					x: game.camera.x,
 					y: game.camera.y
-				};
+				},
+				direction = game.characters.player.dir,
+				controls = game.controls.states,
+				now = new Date().getTime(),
+				distance = (now - game.updated) / 500 * game.speed
+
+			game.updated = now;
 			
-			if(direction == 'up'){
-				newPlayerPos.y = (game.characters.player.y + game.speed).toFixed(1) * 1;
-				newCameraPos.y = (game.camera.y + (game.speed * game.tile)).toFixed(1) * 1;
-			} else if(direction == 'down'){
-				newPlayerPos.y = (game.characters.player.y - game.speed).toFixed(1) * 1;
-				newCameraPos.y = (game.camera.y - (game.speed * game.tile)).toFixed(1) * 1;
-			} else if(direction == 'left'){
-				newPlayerPos.x = (game.characters.player.x - game.speed).toFixed(1) * 1;
-				newCameraPos.x = (game.camera.x + (game.speed * game.tile)).toFixed(1) * 1;
-			} else if(direction == 'right'){
-				newPlayerPos.x = (game.characters.player.x + game.speed).toFixed(1) * 1;
-				newCameraPos.x = (game.camera.x - (game.speed * game.tile)).toFixed(1) * 1;
+			if(controls.up && !controls.down){
+				newPlayerPos.y = (game.characters.player.y + distance);
+				newCameraPos.y = (game.camera.y + (distance * game.tile));
+			} else if(controls.down && !controls.up){
+				newPlayerPos.y = (game.characters.player.y - distance);
+				newCameraPos.y = (game.camera.y - (distance * game.tile));
+			};
+			
+			if(controls.left && !controls.right){
+				newPlayerPos.x = (game.characters.player.x - distance);
+				newCameraPos.x = (game.camera.x + (distance * game.tile));
+			} else if(controls.right && !controls.left){
+				newPlayerPos.x = (game.characters.player.x + distance);
+				newCameraPos.x = (game.camera.x - (distance * game.tile));
 			};
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
@@ -513,7 +523,6 @@
 				
 			if(!collision.collided || collision.collided && collision.object.objectType == 'portal'){
 				$.extend(game.characters.player,{
-					dir: direction,
 					x: newPlayerPos.x,
 					y: newPlayerPos.y
 				});
@@ -556,23 +565,25 @@
 						
 						// SHUNT OBJECT
 						
-						moveable.origin[0] = (moveable.origin[0] + game.speed);
-						$.extend(moveableTranslate, {x: moveableTranslate.x + (game.speed * game.tile)});
+						moveable.origin[0] = (moveable.origin[0] + distance);
+						$.extend(moveableTranslate, {x: moveableTranslate.x + (distance * game.tile)});
 						
 						// UPDATE COLLISIONS
 						
-						$.each(moveable.collisions,function(i){
-							if(this[0] == 'x'){
-								var entry = game.collisionMatrix[this[0]][this[1]][this[2]],
-									newVal = (this[1]+game.speed.toFixed(1)) * 1;
-								if(typeof game.collisionMatrix[this[0]][newVal] == 'undefined'){
-									game.collisionMatrix[this[0]][newVal] = [];
+						for(var i = 0; i < moveable.collisions.length; i++){
+							var self = moveable.collisions[i];
+
+							if(self[0] == 'x'){
+								var entry = game.collisionMatrix[self[0]][self[1]][self[2]],
+									newVal = (self[1]+game.speed.toFixed(1)) * 1;
+								if(typeof game.collisionMatrix[self[0]][newVal] == 'undefined'){
+									game.collisionMatrix[self[0]][newVal] = [];
 								};
 							
-								game.collisionMatrix[this[0]][this[1]].splice(this[2],1);
-								game.collisionMatrix[this[0]][newVal].push(entry);
-								if(!game.collisionMatrix[this[0]][this[1]].length){
-									delete game.collisionMatrix[this[0]][this[1]];
+								game.collisionMatrix[self[0]][self[1]].splice(self[2],1);
+								game.collisionMatrix[self[0]][newVal].push(entry);
+								if(!game.collisionMatrix[self[0]][self[1]].length){
+									delete game.collisionMatrix[self[0]][self[1]];
 								};
 							
 								moveable.collisions[i][1] = newVal;
@@ -583,7 +594,7 @@
 							}
 							
 							// will need to update collisions with new indices;
-						});
+						}
 					};
 					
 					$moveable.data('translate', moveableTranslate);
@@ -630,10 +641,9 @@
 			for(i = 0; i < 2; i++){
 				var axis = i == 0 ? 'x' : 'y',
 					perpAxis = i == 0 ? 'y' : 'x';
-					
 				if(typeof game.collisionMatrix[axis][edge[axis]] !== 'undefined'){
-					$.each(game.collisionMatrix[axis][edge[axis]], function(i){
-						var collisionObject = this;
+					for(var j = 0; j < game.collisionMatrix[axis][edge[axis]].length; j++){
+						var collisionObject = game.collisionMatrix[axis][edge[axis]][j];
 						if(
 							game.characters.player[perpAxis] >= collisionObject[perpAxis+'Min'] && 
 							game.characters.player[perpAxis] <= collisionObject[perpAxis+'Max']
@@ -644,7 +654,7 @@
 							});
 							return false;
 						};
-					});
+					}
 				};
 			};
 			return collision;
@@ -660,8 +670,8 @@
 		
 		detectRoom: function(position){
 			var index = null
-			$.each(game.floorTiles, function(i){
-				floorTile = this;
+			for(var i = 0; i < game.floorTiles.length; i++) {
+				floorTile = game.floorTiles[i];
 				if(
 					game.characters.player.x >= floorTile.xMin &&
 					game.characters.player.x <= floorTile.xMax &&
@@ -670,7 +680,7 @@
 				){
 					index = i;
 				}
-			});
+			}
 			
 			return {
 				roomname: game.floorTiles[index].parentRoom,
@@ -725,8 +735,8 @@
 				pixelY = (obj.origin[1] * game.tile);
 				
 			return {
-				x: pixelX.toFixed() * 1,
-				y: -pixelY.toFixed() * 1
+				x: pixelX,
+				y: -pixelY
 			};
 		},
 		
