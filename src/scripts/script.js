@@ -33,6 +33,10 @@
 				bb: {
 					width: .8,
 					height: .5
+				},
+				images: {
+					body: 'images/scott.svg',
+					foot: 'images/foot.svg'
 				}
 			},
 			npcs: []
@@ -404,6 +408,19 @@
 			// RENDER AND PLACE PLAYER
 			
 			game.$player = $('<div class="char player"><div class="avatar"/></div>').appendTo(game.$world);
+			var $avatar = game.$player.find('.avatar');
+
+			$.each(game.characters.player.images, function(key, value){
+					if(key == 'foot') {
+						var img = '<img class="'+key+'" src="'+value+'">';
+						$avatar.append('<div class="feet">'+img+img+'</div>');
+					} else {
+						$avatar.append('<img class="'+key+'" src="'+value+'">');
+					}
+			});
+
+			game.$player.find('.avatar').append('<img class="" src="">')
+
 			$.extend(game.characters.player,{ 
 				dir: 'up',
 				domNode: game.$player[0],
@@ -615,6 +632,12 @@
 				newPlayerPos.x = (game.characters.player.x + distance);
 				newCameraPos.x -= distance * (game.tile / 2);
 			};
+
+			if(dirX || dirY) {
+				game.$player.addClass('walking');
+			} else {
+				game.$player.removeClass('walking');
+			}
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
@@ -743,8 +766,19 @@
 		*/
 		
 		moveNPCs: function(){
+			var directions = ['up', 'down', 'left', 'right'];
 			for(var i = 0; i < game.characters.npcs.length; i++) {
 				var npc = game.characters.npcs[i];
+
+				if(npc.moves && npc.moves.length <= 1) {
+					for(var i = 0; i < 5; i++) {
+						npc.moves.push({
+							dir: directions[Math.round(Math.random() * 3)],
+							time: Math.round(Math.random() * 5) * 200
+						});
+					}
+				}
+
 				if(npc.moves.length) {
 					var newPos = {
 							x: npc.x,

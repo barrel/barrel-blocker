@@ -16,7 +16,10 @@
 						"origin": [3,0],
 						"axis": "y",
 						"length": 3,
-						"background": "white"
+						"background": "white",
+						"renderOffset": {
+							"x": 0.5
+						}
 					},
 					{
 						"origin": [3,3],
@@ -357,10 +360,10 @@
 		"npcs": [
 			{
 				"type": "coworker",
-				"startPos": [13, 10],
+				"startPos": [12.5, 26],
 				"moves": [
 					{
-						"dir": "left",
+						"dir": "down",
 						"speed": "normal",
 						"time": 1000
 					},

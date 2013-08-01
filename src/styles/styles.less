@@ -90,6 +90,7 @@ body {
 	left: 0;
 	bottom: 0;
 	background-size: 100px !important;
+	border-top: 1px solid transparent;
 }
 
 @playerRotateX: 90deg;
@@ -108,10 +109,6 @@ body {
 		margin-left: -@grid/2;
 		width: @grid;
 		height: 2*@grid;
-		background: url(../images/patrick.gif);
-		background-size: auto 100%;
-		background-position: 50% 50%;
-		background-repeat: no-repeat;
 		
 		.transition(all 200ms);
 		.transform-origin(50%, 100%);
@@ -119,9 +116,16 @@ body {
 		
 		.transform(rotateX((@playerRotateX * -1)));
 		
+		.feet {
+			.transform(translateZ(1px));
+		}
 	
 		.down&{
 			.transform(rotateX((@playerRotateX * -1)) rotateY(180deg));
+
+			.feet {
+				.transform(translateZ(-1px));
+			}
 		}
 	
 		.right&{
@@ -152,6 +156,61 @@ body {
 		
 			.transform(rotateX(@playerRotateX) translate3d(0,0,1px));
 		}
+
+		img {
+			width: 100%;
+		}
+
+		.body {
+			position: absolute;
+			bottom: 8px;
+		}
+
+		.feet {
+			position: absolute;
+			bottom: 0; height: 20px;
+			left: 14px; right: 14px;
+
+			img {
+				position: absolute;
+				width: 55%;
+				right: 0; bottom: 0;
+				&:first-child {
+					right: auto;
+					left: 0;
+				}
+			}
+		}
+	}
+
+	&.walking {
+		.avatar {
+			.feet {
+				.animation(walking 250ms steps(1) infinite);
+				img {
+					&:first-child {
+						bottom: 5px;
+					}
+				}
+			}
+		}
+	}
+}
+
+@-webkit-keyframes walking { .walking-frames; }
+@-moz-keyframes walking { .walking-frames; }
+@-ms-keyframes walking { .walking-frames; }
+@-o-keyframes walking { .walking-frames; }
+@keyframes walking { .walking-frames; }
+.walking-frames() {
+	0% {
+		.transform(none);
+	}
+	50% {
+		.transform(scaleX(-1));
+	}
+	100% {
+		.transform(none);
 	}
 }
 
