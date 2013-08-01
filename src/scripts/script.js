@@ -175,6 +175,12 @@
 						translate.y = -(wall.origin[1] + wall.length) * game.tile;
 						rotate = negative ? {x: 90, y: 270, z: 0} : {x: 90, y: 90, z: 0};
 					};
+
+					if(wall.renderOffset) {
+						$.each(wall.renderOffset, function(key, value){
+							translate[key] += value;
+						});
+					}
 					
 					$wall.data('translate',translate);
 					$wall.data('rotate',rotate);

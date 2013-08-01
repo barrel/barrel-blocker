@@ -54,7 +54,10 @@
 						"origin": [10,4],
 						"axis": "y",
 						"length": -4,
-						"background": "url(images/brick.gif)"
+						"background": "url(images/brick.gif)",
+						"renderOffset": {
+							"x": 0.5
+						}
 					},
 					{
 						"origin": [10,0],

@@ -6,7 +6,6 @@
 
 * {
 	//.box-sizing(border-box);
-	.no-smoothing;
 }
 
 html, body {
@@ -21,14 +20,6 @@ body {
 	.transition(250ms);
 	
 	background: #000;
-
-	&.fade {
-		&:after {
-			content: "";
-			.fill-container;
-			background: fadeOut(white, 2%);
-		}
-	}
 }
 
 #HUD{
@@ -78,7 +69,6 @@ body {
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	background-size: 1s00px !important;
 
 	.transform-origin(0%, 0%);
 	&:not(.backface){
