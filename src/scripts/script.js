@@ -531,7 +531,6 @@
 				game.$player.attr('data-room',game.currentRoom.roomname);
 				game.moveCharacter(game.characters.player);
 			};
-			
 			if(collision.collided){
 				
 				// IF GOING THROUGH A DOOR
@@ -543,7 +542,7 @@
 						doorAngle = 180;
 					
 					if(!collision.object.open){
-						doorAngle = 277
+						doorAngle = 277;
 						collision.object.open = true;
 					} else {
 						collision.object.open = false;
@@ -555,49 +554,61 @@
 				};
 				
 				// IF MOVEABLE OBJECT - IN PROGRESS!
-				
+			
 				if(collision.object.moveable){
+					
 					var $moveable = $('#'+collision.object.parent),
 						moveable = game.moveables[collision.object.parent],
 						moveableTranslate = $moveable.data('translate');
 						
-					if(direction == 'right'){
+					if(direction == 'right' || direction == 'left'){
 						
 						// SHUNT OBJECT
 						
-						moveable.origin[0] = (moveable.origin[0] + distance);
-						$.extend(moveableTranslate, {x: moveableTranslate.x + (distance * game.tile)});
+						var increment = direction == 'right' ? distance : -distance;
+						
+						moveable.origin[0] = (moveable.origin[0] + increment);
+						
+						$.extend(moveableTranslate, {x: moveableTranslate.x + (increment * game.tile)});
 						
 						// UPDATE COLLISIONS
 						
-						for(var i = 0; i < moveable.collisions.length; i++){
-							var self = moveable.collisions[i];
+						$.each(moveable.collisions,function(i){
+							var indices = this,
+								axis = indices[0],
+								collideAt = indices[1],
+								entryIndex = indices[2],
+								data = game.collisionMatrix[axis][collideAt][indices[2]];
+							
+							if(axis == 'x'){ // filter to only x (as we are moving left/right)
 
-							if(self[0] == 'x'){
-								var entry = game.collisionMatrix[self[0]][self[1]][self[2]],
-									newVal = (self[1]+game.speed.toFixed(1)) * 1;
-								if(typeof game.collisionMatrix[self[0]][newVal] == 'undefined'){
-									game.collisionMatrix[self[0]][newVal] = [];
+								var newCollideAt = (collideAt + increment).toFixed(1) * 1;
+								
+								// update perpendicular min max values also;
+						
+								if(typeof game.collisionMatrix[axis][newCollideAt] == 'undefined'){
+									game.collisionMatrix[axis][newCollideAt] = [];
+								};
+					
+								game.collisionMatrix[axis][collideAt].splice(entryIndex,1); // <-- this is the problem (not deleting)!
+								game.collisionMatrix[axis][newCollideAt].push(data);
+								if(!game.collisionMatrix[axis][collideAt].length){
+									delete game.collisionMatrix[axis][collideAt];
 								};
 							
-								game.collisionMatrix[self[0]][self[1]].splice(self[2],1);
-								game.collisionMatrix[self[0]][newVal].push(entry);
-								if(!game.collisionMatrix[self[0]][self[1]].length){
-									delete game.collisionMatrix[self[0]][self[1]];
-								};
-							
-								moveable.collisions[i][1] = newVal;
+								moveable.collisions[i][1] = newCollideAt;
+								moveable.collisions[i][2] = game.collisionMatrix[axis][newCollideAt].length - 1;
 							
 							
-							} else {
-								//update min and max vals for perpendicular plane
-							}
+							};
 							
 							// will need to update collisions with new indices;
 						}
 					};
 					
 					$moveable.data('translate', moveableTranslate);
+					//console.info('done, heres the matrix');
+					//console.info(game.collisionMatrix);
 				};
 			};
 		},
