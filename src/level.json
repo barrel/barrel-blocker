@@ -51,7 +51,7 @@
 						"origin": [0,30],
 						"axis": "x",
 						"length": 15,
-						"background": "#bc6450",
+						"background": "url(images/brick2.gif)",
 						"contents": [
 							{
 								"objectClass": "decoration",
@@ -80,7 +80,7 @@
 						"origin": [15,30],
 						"axis": "y",
 						"length": -30,
-						"background": "#bc6450",
+						"background": "url(images/brick2.gif)",
 						"contents": [
 							{
 								"objectClass": "decoration",
@@ -127,7 +127,7 @@
 					}
 				],
 				"floor": {
-					"background" : "#623f2a"
+					"background" : "url(images/floor2.gif)"
 				},
 				"furniture": [
 					{
@@ -353,7 +353,7 @@
 					}
 				],
 				"floor": {
-					"background" : "#623f2a"
+					"background" : "url(images/floor2.gif)"
 				}
 			}
 		],
