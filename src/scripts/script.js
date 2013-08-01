@@ -29,8 +29,8 @@
 				x: null,
 				y: null,
 				bb: {
-					width: 0.1,
-					height: 0.1
+					width: 1,
+					height: 1
 				}
 			},
 			npcs: []
@@ -520,7 +520,7 @@
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
 			var collision = game.detectCollision(newPlayerPos, direction, game.characters.player.bb);
-				
+
 			if(!collision.collided || collision.collided && collision.object.objectType == 'portal'){
 				$.extend(game.characters.player,{
 					x: newPlayerPos.x,
@@ -644,26 +644,44 @@
 			var collision = {
 					collided: false
 				},
-				edge = {};
+				collideAt = {};
 	
-			edge.x = direction == 'right' ? position.x + bb.width : position.x; 
-			edge.y = direction == 'up' ? position.y + bb.height : position.y;
-			
+			collideAt.x = direction == 'right' ? Math.ceil((position.x + bb.width) * 10) / 10 : Math.floor(position.x * 10 ) / 10, 
+			collideAt.y = direction == 'up' ? Math.ceil((position.y + bb.height) * 10) / 10 : Math.floor(position.y * 10 ) / 10,
+			offset = (direction == 'right' || direction == 'left') ? bb.height : bb.width;
+
 			for(i = 0; i < 2; i++){
 				var axis = i == 0 ? 'x' : 'y',
 					perpAxis = i == 0 ? 'y' : 'x';
-				if(typeof game.collisionMatrix[axis][edge[axis]] !== 'undefined'){
-					for(var j = 0; j < game.collisionMatrix[axis][edge[axis]].length; j++){
-						var collisionObject = game.collisionMatrix[axis][edge[axis]][j];
+				if(typeof game.collisionMatrix[axis][collideAt[axis]] !== 'undefined'){
+					
+					for(var j = 0; j < game.collisionMatrix[axis][collideAt[axis]].length; j++){
+						var collisionObject = game.collisionMatrix[axis][collideAt[axis]][j];
+						
 						if(
-							game.characters.player[perpAxis] >= collisionObject[perpAxis+'Min'] && 
-							game.characters.player[perpAxis] <= collisionObject[perpAxis+'Max']
+							// CHECK IF CHARACTER IS WITHIN PERPENDICULAR THRESHOLDS
+							(collideAt[perpAxis] >= collisionObject[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset <= collisionObject[perpAxis+'Max']) ||
+							
+							// CHECK IF CHARACTER ENVELOPS PERPENDICULAR THRESHOLDS
+							
+							(collideAt[perpAxis] <= collisionObject[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset >= collisionObject[perpAxis+'Max']) ||
+							
+							// CHECK IF CHARACTER INTERSECTS EITHER PERPENDICULAR THRESHOLD
+							
+							(collideAt[perpAxis] <= collisionObject[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset >= collisionObject[perpAxis+'Min']) ||
+							
+							(collideAt[perpAxis] <= collisionObject[perpAxis+'Max'] && 
+							collideAt[perpAxis] + offset >= collisionObject[perpAxis+'Max'])
+							
 						){
 							$.extend(collision, {
 								collided: true,
 								object: collisionObject
 							});
-							return false;
+							return collision;
 						};
 					}
 				};
