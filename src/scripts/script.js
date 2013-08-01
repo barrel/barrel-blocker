@@ -12,7 +12,8 @@
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		viewingAngle: 45,
+		cameraAngle: 45,
+		cameraPerspective: 1500,
 		world: {
 			width: null,
 			height: null
@@ -97,13 +98,17 @@
 						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
 					};
 					
-					var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
+					var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
 					
 					game.$world.css({
 						width: game.world.width+'px',
 						height: game.world.length+'px',
 						margin: (game.world.length / -2)+'px 0 0 '+(game.world.width / -2)+'px'
 					}).css(cameraTransform);
+
+					$('body').css({
+						perspective: game.cameraPerspective+'px'
+					});
 
 					game.renderEnvironment();
 				},
@@ -464,7 +469,7 @@
 
 				// REDRAW CAMERA
 
-				var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
+				var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
 
 				game.$world.css(cameraTransform);
 
