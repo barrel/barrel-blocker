@@ -169,6 +169,12 @@
 					"background": "red"
 				}
 			}
+		],
+		"npcs": [
+			{
+				"type": "coworker",
+				"startPos": [10, 10]
+			}
 		]
 		
 	}

@@ -357,6 +357,8 @@
 		*/
 
 		renderChars: function(){
+
+			// RENDER AND PLACE PLAYER
 			
 			game.$player = $('<div class="char player"><div class="avatar"/></div>').appendTo(game.$world);
 			$.extend(game.characters.player,{ 
@@ -374,6 +376,33 @@
 			});
 			
 			game.moveCharacter(game.characters.player);
+
+			// RENDER AND PLACE NPCS
+
+			game.$npcs = [];
+
+			$.each(game.levelData.npcs, function(){
+				var $npc = $('<div class="char '+this.type+'"><div class="avatar"/></div>').appendTo(game.$world),
+					npc = {
+						type: this.type,
+						dir: 'down',
+						domNode: $npc[0],
+						x: this.startPos[0],
+						y: this.startPos[1],
+						bb: game.characters.player.bb
+					}
+
+				$npc.css({
+					width: (npc.bb.width * game.tile)+'px',
+					height: (npc.bb.height * game.tile)+'px'
+				});
+
+				console.log($npc);
+				game.$npcs.push($npc);
+				game.characters.npcs.push(npc);
+
+				game.moveCharacter(npc);
+			});
 			
 			game.bindControls();
 		},
@@ -457,6 +486,11 @@
 				game.$player.css(playerTransform);
 
 				// REDRAW NPCs
+
+				for(var i = 0; i < game.$npcs.length; i++) {
+					var $npc = game.$npcs[i];
+					$npc.css(game.getTransformCSS($npc.data('translate')));
+				}
 
 				// REDRAW MOVEABLE OBJECTS
 				
