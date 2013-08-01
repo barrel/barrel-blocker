@@ -178,7 +178,7 @@
 					{
 						"dir": "down",
 						"speed": "normal",
-						"time": 2
+						"time": 1000
 					}
 				]
 			}
