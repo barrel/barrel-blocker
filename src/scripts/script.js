@@ -1242,5 +1242,5 @@
 /* --- DOM READY --- */
 
 $(function() {
-	$('#World').barrelBlocker('test.json');
+	$('#World').barrelBlocker('level.json');
 });
