@@ -6,7 +6,7 @@
 			"width": 20,
 			"length": 20
 		},
-		"startPos": [10,5],
+		"startPos": [8,9],
 		"rooms": [
 			{
 				"roomname": "office",
@@ -69,7 +69,7 @@
 					
 				],
 				"floor": {
-					"background" : "url(images/wood.gif)"
+					"background" : "gray"
 				},
 				"furniture": [
 					{
@@ -173,7 +173,14 @@
 		"npcs": [
 			{
 				"type": "coworker",
-				"startPos": [10, 10]
+				"startPos": [10, 10],
+				"moves": [
+					{
+						"dir": "down",
+						"speed": "normal",
+						"time": 2
+					}
+				]
 			}
 		]
 		
