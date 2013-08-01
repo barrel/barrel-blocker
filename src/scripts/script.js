@@ -12,7 +12,7 @@
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		cameraAngle: 60,
+		cameraAngle: 75,
 		cameraPerspective: 2500,
 		world: {
 			width: null,
@@ -21,7 +21,8 @@
 		rooms: {},
 		camera: {
 			x: null,
-			y: null
+			y: null,
+			z: null
 		},
 		characters: {
 			player: {
@@ -100,7 +101,8 @@
 					});
 					game.camera = {
 						x: game.tile * ((game.levelData.world.width / 2) - game.characters.player.x),
-						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
+						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y),
+						z: 0
 					};
 					
 					var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
@@ -198,6 +200,28 @@
 					var wallTransform = game.getTransformCSS(translate, rotate);	
 				
 					$wall.css(wallTransform);
+
+					if(wall.contents) {
+						$.each(wall.contents, function() {
+							var decoration = this;
+
+							$deco = $('<div class="object '+decoration.objectClass+'" id="'+decoration.objectName+'"/>').appendTo($wall);
+
+							var styles = {
+								'width': game.tile * decoration.width,
+								'bottom': game.tile * decoration.origin[1]
+							};
+
+							if(negative) {
+								styles['right'] = game.tile * decoration.origin[0];
+							} else {
+								styles['left'] = game.tile * decoration.origin[0];
+							}
+
+							$deco.css(styles);
+							$deco.append('<img src="'+decoration.img+'">');
+						});
+					}
 					
 					// ADD TO COLLISION MATRIX
 					
@@ -348,6 +372,20 @@
 							collisions: collisions
 						}
 					};
+
+					if(furn.contents) {
+						$.each(furn.contents, function() {
+							var obj = this;
+
+							$obj = $('<div class="object '+obj.objectClass+'" id="'+obj.objectName+'"/>').appendTo($furn);
+							$obj.css({
+								'width': game.tile * obj.width,
+								'left': game.tile * obj.origin[0],
+								'bottom': game.tile * obj.origin[1]
+							})
+							$obj.append('<img src="'+obj.img+'">');
+						});
+					}
 					
 					
 				});
@@ -543,7 +581,8 @@
 				},
 				newCameraPos = {
 					x: game.camera.x,
-					y: game.camera.y
+					y: game.camera.y,
+					z: game.camera.z
 				},
 				direction = game.characters.player.dir,
 				controls = game.controls.states,
@@ -558,21 +597,23 @@
 			if(controls.up && !controls.down){
 				dirY = 'up';
 				newPlayerPos.y = (game.characters.player.y + distance);
-				newCameraPos.y = (game.camera.y + (distance * game.tile));
+				newCameraPos.y += distance * (game.tile / 2);
+				newCameraPos.z += distance * (game.tile / 2);
 			} else if(controls.down && !controls.up){
 				dirY = 'down';
 				newPlayerPos.y = (game.characters.player.y - distance);
-				newCameraPos.y = (game.camera.y - (distance * game.tile));
+				newCameraPos.y -= distance * (game.tile / 2);
+				newCameraPos.z -= distance * (game.tile / 2);
 			};
 			
 			if(controls.left && !controls.right){
 				dirX = 'left';
 				newPlayerPos.x = (game.characters.player.x - distance);
-				newCameraPos.x = (game.camera.x + (distance * game.tile));
+				newCameraPos.x += distance * (game.tile / 2);
 			} else if(controls.right && !controls.left){
 				dirX = 'right'
 				newPlayerPos.x = (game.characters.player.x + distance);
-				newCameraPos.x = (game.camera.x - (distance * game.tile));
+				newCameraPos.x -= distance * (game.tile / 2);
 			};
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
@@ -718,7 +759,6 @@
 
 					npc.updated = now;
 					npc.moves[0].time -= elapsed;
-					console.log(npc.moves[0].time);
 
 
 					if(direction == 'up'){
@@ -746,7 +786,7 @@
 						npc.moves.shift();
 					}
 
-					if(npc.moves[0].time <= 0) {
+					if(npc.moves[0] && npc.moves[0].time <= 0) {
 						npc.moves.shift();
 					}
 				}
@@ -874,7 +914,7 @@
 			var styles = {};
 			for(var i = 0; i < 2; i++){
 				var prefix = i == 0 ? game.prefix : '';
-				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, '+translate.z+'px) rotateX('+rotate.x+'deg) rotateY('+rotate.y+'deg) rotateZ('+rotate.z+'deg)';
+				styles[prefix+'transform'] = 'translate3d('+translate.x+'px, '+translate.y+'px, '+translate.z+'px) rotateX('+(rotate.x)+'deg) rotateY('+rotate.y+'deg) rotateZ('+rotate.z+'deg)';
 			};
 			return styles;
 		},

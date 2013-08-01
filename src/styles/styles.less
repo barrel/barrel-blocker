@@ -74,6 +74,14 @@ body {
 	&.portal{
 		.transition(all 500ms cubic-bezier(0.165, 0.84, 0.44, 1));
 	}
+
+	.object {
+		position: absolute;
+
+		img {
+			width: 100%;
+		}
+	}
 }
 
 .floortile{
@@ -168,6 +176,38 @@ body {
 	
 	.transform-origin(0%, 0%);	
 	.wf();
+}
+
+.furniture {
+	.object {
+		position: absolute;
+		.transform-origin(50%, 100%);
+		.transform(rotateX(-90deg));
+
+		img {
+			max-width: 100%;
+		}
+	}
+}
+
+.desk {
+
+	.x-plane {
+		background-size: 50% auto !important;
+	}
+
+	.x-plane:not(.negative) {
+		.backface-visibility(visible);
+	}
+
+	.x-plane, .y-plane {
+		&:before {
+			content: "";
+			.box-sizing(border-box);
+			.fill-container;
+			border-bottom: 10px solid white;
+		}
+	}
 }
 
 .table {
