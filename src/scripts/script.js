@@ -12,7 +12,8 @@
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		viewingAngle: 45,
+		cameraAngle: 45,
+		cameraPerspective: 1500,
 		world: {
 			width: null,
 			height: null
@@ -97,13 +98,17 @@
 						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y)
 					};
 					
-					var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
+					var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
 					
 					game.$world.css({
 						width: game.world.width+'px',
 						height: game.world.length+'px',
 						margin: (game.world.length / -2)+'px 0 0 '+(game.world.width / -2)+'px'
 					}).css(cameraTransform);
+
+					$('body').css({
+						perspective: game.cameraPerspective+'px'
+					});
 
 					game.renderEnvironment();
 				},
@@ -175,6 +180,12 @@
 						translate.y = -(wall.origin[1] + wall.length) * game.tile;
 						rotate = negative ? {x: 90, y: 270, z: 0} : {x: 90, y: 90, z: 0};
 					};
+
+					if(wall.renderOffset) {
+						$.each(wall.renderOffset, function(key, value){
+							translate[key] += value;
+						});
+					}
 					
 					$wall.data('translate',translate);
 					$wall.data('rotate',rotate);
@@ -346,6 +357,8 @@
 		*/
 
 		renderChars: function(){
+
+			// RENDER AND PLACE PLAYER
 			
 			game.$player = $('<div class="char player"><div class="avatar"/></div>').appendTo(game.$world);
 			$.extend(game.characters.player,{ 
@@ -363,6 +376,33 @@
 			});
 			
 			game.moveCharacter(game.characters.player);
+
+			// RENDER AND PLACE NPCS
+
+			game.$npcs = [];
+
+			$.each(game.levelData.npcs, function(){
+				var $npc = $('<div class="char '+this.type+'"><div class="avatar"/></div>').appendTo(game.$world),
+					npc = {
+						type: this.type,
+						dir: 'down',
+						domNode: $npc[0],
+						x: this.startPos[0],
+						y: this.startPos[1],
+						bb: game.characters.player.bb
+					}
+
+				$npc.css({
+					width: (npc.bb.width * game.tile)+'px',
+					height: (npc.bb.height * game.tile)+'px'
+				});
+
+				console.log($npc);
+				game.$npcs.push($npc);
+				game.characters.npcs.push(npc);
+
+				game.moveCharacter(npc);
+			});
 			
 			game.bindControls();
 		},
@@ -447,6 +487,11 @@
 
 				// REDRAW NPCs
 
+				for(var i = 0; i < game.$npcs.length; i++) {
+					var $npc = game.$npcs[i];
+					$npc.css(game.getTransformCSS($npc.data('translate')));
+				}
+
 				// REDRAW MOVEABLE OBJECTS
 				
 				$.each(game.moveables, function(key, value){
@@ -458,7 +503,7 @@
 
 				// REDRAW CAMERA
 
-				var cameraTransform = game.getTransformCSS(game.camera, {x: game.viewingAngle, y: 0, z: 0});
+				var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
 
 				game.$world.css(cameraTransform);
 
