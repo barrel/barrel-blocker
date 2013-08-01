@@ -8,12 +8,12 @@
 		$player: null,
 		levelData: null,
 		tile: 100,
-		speed: 1.3,
+		speed: 2.5,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		cameraAngle: 45,
-		cameraPerspective: 1500,
+		cameraAngle: 60,
+		cameraPerspective: 2500,
 		world: {
 			width: null,
 			height: null
@@ -389,6 +389,7 @@
 						domNode: $npc[0],
 						x: this.startPos[0],
 						y: this.startPos[1],
+						moves: this.moves,
 						bb: game.characters.player.bb
 					}
 
@@ -397,7 +398,6 @@
 					height: (npc.bb.height * game.tile)+'px'
 				});
 
-				console.log($npc);
 				game.$npcs.push($npc);
 				game.characters.npcs.push(npc);
 
@@ -656,6 +656,22 @@
 					//console.info(game.collisionMatrix);
 				};
 			};
+		},
+
+		/*
+		*	MOVE NPCS
+		*	
+		*	Calculates player and camera positions.
+		*	Updates new positions if no collisions.
+		*/
+		
+		moveNPCs: function(){
+			for(var i = 0; i < game.characters.npcs.length; i++) {
+				var npc = game.characters.npcs[i];
+				if(npc.moves) {
+
+				}
+			}
 		},
 		
 		/*
