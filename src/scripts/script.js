@@ -30,13 +30,18 @@
 				x: null,
 				y: null,
 				bb: {
-					width: 0.1,
-					height: 0.1
+					width: .8,
+					height: .5
 				}
 			},
 			npcs: []
 		},
 		moveables: {},
+		shunt: {
+			shunting: false,
+			shuntStart: [0,0],
+			shuntEnd: [0,0]
+		},
 		currentRoom: null,
 		collisionMatrix: {
 			x: {},
@@ -542,31 +547,48 @@
 				direction = game.characters.player.dir,
 				controls = game.controls.states,
 				now = new Date().getTime(),
-				distance = (now - game.updated) / 500 * game.speed
-
-			game.updated = now;
+				distance = (now - game.updated) / 500 * game.speed,
+				dirX,
+				dirY;
+				
+				game.updated = now;
+				
 			
 			if(controls.up && !controls.down){
+				dirY = 'up';
 				newPlayerPos.y = (game.characters.player.y + distance);
 				newCameraPos.y = (game.camera.y + (distance * game.tile));
 			} else if(controls.down && !controls.up){
+				dirY = 'down';
 				newPlayerPos.y = (game.characters.player.y - distance);
 				newCameraPos.y = (game.camera.y - (distance * game.tile));
 			};
 			
 			if(controls.left && !controls.right){
+				dirX = 'left';
 				newPlayerPos.x = (game.characters.player.x - distance);
 				newCameraPos.x = (game.camera.x + (distance * game.tile));
 			} else if(controls.right && !controls.left){
+				dirX = 'right'
 				newPlayerPos.x = (game.characters.player.x + distance);
 				newCameraPos.x = (game.camera.x - (distance * game.tile));
 			};
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
-			var collision = game.detectCollision(newPlayerPos, direction, game.characters.player.bb);
+			var collisionX = game.detectCollision(newPlayerPos, dirX, game.characters.player.bb),
+				collisionY = game.detectCollision(newPlayerPos, dirY, game.characters.player.bb),
+				collision = {
+					collided: false
+				};
 				
-			if(!collision.collided || collision.collided && collision.object.objectType == 'portal'){
+			if(collisionX.collided){
+				collision = collisionX;
+			} else if(collisionY.collided){
+				collision = collisionY;
+			};
+			
+			function moveAlong(){
 				$.extend(game.characters.player,{
 					x: newPlayerPos.x,
 					y: newPlayerPos.y
@@ -576,9 +598,16 @@
 				game.$player.attr('data-room',game.currentRoom.roomname);
 				game.moveCharacter(game.characters.player);
 			};
-			if(collision.collided){
+
+			if(!collision.collided){
+				moveAlong();
+			};
+			
+			// IF GOING THROUGH A DOOR
+			
+			if(collision.collided && collision.object.objectType == 'portal'){
 				
-				// IF GOING THROUGH A DOOR
+				moveAlong();
 				
 				if(collision.object.objectType == 'portal'){
 					var $door = $(collision.object.domNode),
@@ -591,26 +620,37 @@
 						collision.object.open = true;
 					} else {
 						collision.object.open = false;
-					}
+					};
 				
 					doorTransform = game.getTransformCSS(doorTranslate, {x: doorRotate.x, y: doorAngle, z: doorRotate.z});
 						
 					$door.css(doorTransform);
 				};
+			};
 				
 				// IF MOVEABLE OBJECT - IN PROGRESS!
 			
-				if(collision.object.moveable){
+			if(collision.collided && collision.object.moveable){
+				
+				moveAlong();
 					
-					var $moveable = $('#'+collision.object.parent),
-						moveable = game.moveables[collision.object.parent],
-						moveableTranslate = $moveable.data('translate');
+				var $moveable = $('#'+collision.object.parent),
+					moveable = game.moveables[collision.object.parent],
+					moveableTranslate = $moveable.data('translate');
+					
+				game.shunt = {
+					shunting: direction,
+					shuntStart: [newPlayerPos.x, newPlayerPos.y]
+				};	
+					
+				$moveable.data('translate', moveableTranslate);
 						
-					if(direction == 'right' || direction == 'left'){
+			};
+					//if(direction == 'right' || direction == 'left'){
 						
 						// SHUNT OBJECT
 						
-						var increment = direction == 'right' ? distance : -distance;
+						/*var increment = direction == 'right' ? distance : -distance;
 						
 						moveable.origin[0] = (moveable.origin[0] + increment);
 						
@@ -648,14 +688,9 @@
 							};
 							
 							// will need to update collisions with new indices;
-						}
-					};
+						}*/
+					//};
 					
-					$moveable.data('translate', moveableTranslate);
-					//console.info('done, heres the matrix');
-					//console.info(game.collisionMatrix);
-				};
-			};
 		},
 
 		/*
@@ -702,29 +737,48 @@
 		*/
 		
 		detectCollision: function(position, direction, bb){
+			
 			var collision = {
 					collided: false
 				},
-				edge = {};
+				collideAt = {};
 	
-			edge.x = direction == 'right' ? position.x + bb.width : position.x; 
-			edge.y = direction == 'up' ? position.y + bb.height : position.y;
-			
+			collideAt.x = direction == 'right' ? Math.ceil((position.x + bb.width) * 10) / 10 : Math.floor(position.x * 10 ) / 10, 
+			collideAt.y = direction == 'up' ? Math.ceil((position.y + bb.height) * 10) / 10 : Math.floor(position.y * 10 ) / 10,
+			offset = (direction == 'right' || direction == 'left') ? bb.height : bb.width;
+
 			for(i = 0; i < 2; i++){
 				var axis = i == 0 ? 'x' : 'y',
 					perpAxis = i == 0 ? 'y' : 'x';
-				if(typeof game.collisionMatrix[axis][edge[axis]] !== 'undefined'){
-					for(var j = 0; j < game.collisionMatrix[axis][edge[axis]].length; j++){
-						var collisionObject = game.collisionMatrix[axis][edge[axis]][j];
+				if(typeof game.collisionMatrix[axis][collideAt[axis]] !== 'undefined'){
+				
+					for(var j = 0; j < game.collisionMatrix[axis][collideAt[axis]].length; j++){
+						var collisionObject = game.collisionMatrix[axis][collideAt[axis]][j];
+						
 						if(
-							game.characters.player[perpAxis] >= collisionObject[perpAxis+'Min'] && 
-							game.characters.player[perpAxis] <= collisionObject[perpAxis+'Max']
+							// CHECK IF CHARACTER IS WITHIN PERPENDICULAR THRESHOLDS
+							(collideAt[perpAxis] >= collisionObject[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset <= collisionObject[perpAxis+'Max']) ||
+							
+							// CHECK IF CHARACTER ENVELOPS PERPENDICULAR THRESHOLDS
+							
+							(collideAt[perpAxis] <= collisionObject[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset >= collisionObject[perpAxis+'Max']) ||
+							
+							// CHECK IF CHARACTER INTERSECTS EITHER PERPENDICULAR THRESHOLD
+							
+							(collideAt[perpAxis] < collisionObject[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset - 0.1 > collisionObject[perpAxis+'Min']) ||
+							
+							(collideAt[perpAxis] < collisionObject[perpAxis+'Max'] && 
+							collideAt[perpAxis] + offset - 0.1 > collisionObject[perpAxis+'Max'])
+							
 						){
 							$.extend(collision, {
 								collided: true,
 								object: collisionObject
 							});
-							return false;
+							return collision;
 						};
 					}
 				};
