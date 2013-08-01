@@ -63,7 +63,7 @@
 						"origin": [10,0],
 						"axis": "x",
 						"length": -10,
-						"background": "white",
+						"background": "hsla(0,100%,100%,0.25)",
 						"backfaceVisible": true
 					}
 					
