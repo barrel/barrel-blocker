@@ -747,6 +747,7 @@
 						
 			};
 					
+			game.moveNPCs();
 		},
 		
 		dropMoveable: function(objectName, shuntDir){
@@ -844,7 +845,6 @@
 			
 			
 			console.info(game.collisionMatrix);
-			game.moveNPCs();
 		},
 
 		/*
