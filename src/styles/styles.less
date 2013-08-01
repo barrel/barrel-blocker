@@ -145,6 +145,12 @@ body {
 	}
 }
 
+.coworker{
+	.avatar{
+		background: blue;
+	}
+}
+
 .furniture,
 .furniture .face{
 	position: absolute;
@@ -160,4 +166,24 @@ body {
 	
 	.transform-origin(0%, 0%);	
 	.wf();
+}
+
+.table {
+	.box-sizing(border-box);
+	background-size: 40px !important;
+	&:after {
+		content: "";
+		.fill-container;
+		border: 1px solid fadeOut(black, 75%);
+	}
+
+	.x-plane.negative {
+		&:after {
+			content: "";
+			.fill-container;
+			left: 8px; right: 8px;
+			bottom: 8px;
+			background: white;
+		}
+	}
 }

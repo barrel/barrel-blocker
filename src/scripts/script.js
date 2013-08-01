@@ -8,7 +8,7 @@
 		$player: null,
 		levelData: null,
 		tile: 100,
-		speed: 1.3,
+		speed: 2.5,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
