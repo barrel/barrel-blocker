@@ -395,7 +395,8 @@
 						x: this.startPos[0],
 						y: this.startPos[1],
 						moves: this.moves,
-						bb: game.characters.player.bb
+						bb: game.characters.player.bb,
+						updated: new Date().getTime()
 					}
 
 				$npc.css({
@@ -691,20 +692,63 @@
 						}*/
 					//};
 					
+			game.moveNPCs();
 		},
 
 		/*
 		*	MOVE NPCS
 		*	
-		*	Calculates player and camera positions.
-		*	Updates new positions if no collisions.
+		*	Calculates positions for all NPCs.
 		*/
 		
 		moveNPCs: function(){
 			for(var i = 0; i < game.characters.npcs.length; i++) {
 				var npc = game.characters.npcs[i];
-				if(npc.moves) {
+				if(npc.moves.length) {
+					var newPos = {
+							x: npc.x,
+							y: npc.y
+						},
+						direction = npc.moves[0].dir,
+						now = new Date().getTime(),
+						elapsed = (now - npc.updated),
+						distance = elapsed / 500 * game.speed,
+						dirX,
+						dirY;
 
+					npc.updated = now;
+					npc.moves[0].time -= elapsed;
+					console.log(npc.moves[0].time);
+
+
+					if(direction == 'up'){
+						newPos.y += distance;
+					} else if(direction == 'down'){
+						newPos.y -= distance;
+					};
+
+					if(direction == 'left'){
+						newPos.x -= distance;
+					} else if(direction == 'right'){
+						newPos.x += distance;
+					};
+
+					var collision = game.detectCollision(newPos, direction, npc.bb);
+				
+					function moveAlong(){
+						$.extend(npc,newPos);
+						game.moveCharacter(npc);
+					};
+
+					if(!collision.collided){
+						moveAlong();
+					} else {
+						npc.moves.shift();
+					}
+
+					if(npc.moves[0].time <= 0) {
+						npc.moves.shift();
+					}
 				}
 			}
 		},
