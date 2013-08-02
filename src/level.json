@@ -199,7 +199,7 @@
 						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
-						"dimensions": [0.75,0.75,0.75],
+						"dimensions": [0.8,0.8,0.8],
 						"origin": [7,10],
 						"skin": {
 							"top": "none",
@@ -215,7 +215,7 @@
 						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
-						"dimensions": [0.75,0.75,0.75],
+						"dimensions": [0.8,0.8,0.8],
 						"origin": [10,8],
 						"skin": {
 							"top": "none",
@@ -231,7 +231,7 @@
 						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
-						"dimensions": [0.75,0.75,0.75],
+						"dimensions": [0.8,0.8,0.8],
 						"origin": [13,10],
 						"skin": {
 							"top": "none",
