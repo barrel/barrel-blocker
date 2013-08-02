@@ -16,21 +16,27 @@ html, body {
 body {
 	.perspective-origin(50%, 0%);
 	background: #abeffe;
+	font-family: 'Outage', sans-serif;
 }
 
 #HUD{
 	position: absolute;
 	left: 0;
 	right: 0;
-	height: 50px;
-	line-height: 10px;
-	padding: 20px;
-	background: rgba(0,0,0,.4);
-	color: #fff;
-	font-family: 'Helvetica Neue';
+	height: 87px;
+	line-height: 87px;
+	padding: 0 20px;
+	background: black;
+	color: #666666;
 	font-weight: 300;
-	
-	//.just();
+
+	> * {
+		display: inline-block;
+		vertical-align: middle;
+		> * {
+			margin: 0;
+		}
+	}
 }
 
 #Time, #Score {
@@ -122,7 +128,6 @@ body {
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	background: blue;
 	
 	.transform-style(preserve-3d);
 
@@ -399,4 +404,8 @@ body {
 	to {
 		.transform(translate3d(100%,0,0));
 	}
+}
+
+#SplashPage {
+	text-align: center;
 }
