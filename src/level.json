@@ -193,6 +193,37 @@
 						}
 					},
 					{
+						"objectClass": "desk",
+						"objectName": "Desk1",
+						"shape": "cuboid",
+						"moveable": false,
+						"dimensions": [4,1,1],
+						"origin": [7,15],
+						"skin": {
+							"top": "white",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						},
+						"contents": [
+							{
+								"objectClass": "imac",
+								"objectName": "Imac1",
+								"width": 1,
+								"origin": [0.5, 0.5],
+								"img": "images/imac.svg"
+							},
+							{
+								"objectClass": "imac",
+								"objectName": "Imac2",
+								"width": 1,
+								"origin": [2.5, 0.5],
+								"img": "images/imac.svg"
+							}
+						]
+					},
+					{
 						"objectClass": "plant",
 						"objectName": "Plant",
 						"shape": "cuboid",

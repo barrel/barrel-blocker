@@ -376,11 +376,11 @@ body {
 	}
 
 	.x-plane, .y-plane {
-		&:before {
-			content: "";
-			.box-sizing(border-box);
-			.fill-container;
-			border-bottom: 10px solid white;
+		.pseudo-border(15px, darken(white, 30%));
+		&:after {
+			border-top: none;
+			border-bottom-color: white;
+			border-bottom-width: 10px;
 		}
 	}
 }
