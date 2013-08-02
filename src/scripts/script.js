@@ -31,7 +31,7 @@
 				x: null,
 				y: null,
 				bb: {
-					width: .8,
+					width: .5,
 					height: .5
 				},
 				images: {
@@ -378,13 +378,17 @@
 					$furn = $('<div class="furniture '+furn.objectClass+'" id="'+furn.objectName+'"/>').appendTo($room);
 					
 					if(furn.shape == 'cuboid'){
-						var collisions = game.buildCuboid($furn, furn, room);
+						game.buildCuboid($furn, furn, room);
 					};
 					
 					if(furn.moveable){
 						game.moveables[furn.objectName] = {
 							domObj: $furn[0],
-							origin: furn.origin
+							origin: furn.origin,
+							bb: {
+								width: furn.dimensions[0],
+								height: furn.dimensions[1]
+							}
 						}
 					};
 
@@ -740,18 +744,47 @@
 						shuntStart: [newPlayerPos.x, newPlayerPos.y]
 					};	
 					
+					$moveable.addClass('shunting');
+					
 					// LOCK OBJECT TO PLAYER 
 				} else {
-					moveAlong();
+					
+					// CHECK FOR COLLISIONS ON MOVEABLE OBJECT WHILE PUSHING
+					
 					
 					var increment = direction == 'right' || direction == 'left' ? distanceMoved.x : -distanceMoved.y,
 						axis = direction == 'right' || direction == 'left' ? 'x' : 'y',
 						newTranslate = {};
 						
-					newTranslate[axis] = moveableTranslate[axis] + (increment * game.tile);
+					var collisionOrigin = {}
+					if(axis == 'x'){
+						collisionOrigin.x = direction == 'right' ? newPlayerPos.x + game.characters.player.bb.width : newPlayerPos.x - game.moveables[game.shunt.objectName].bb.width,
+						collisionOrigin.y = newPlayerPos.y
+					} else {
+						collisionOrigin.y = direction == 'up' ? newPlayerPos.y + game.characters.player.bb.height : newPlayerPos.y - game.moveables[game.shunt.objectName].bb.height,
+						collisionOrigin.x = newPlayerPos.x
+					}
+
+					var moveableCollision = game.detectCollision(
+										collisionOrigin, 
+										direction, 
+										game.moveables[game.shunt.objectName].bb
+									);			
 						
-					$.extend(moveableTranslate, newTranslate);
-					$moveable.data('translate', moveableTranslate);
+					if(!moveableCollision.collided){	
+						moveAlong();
+						
+						newTranslate[axis] = moveableTranslate[axis] + (increment * game.tile);
+						
+						$.extend(moveableTranslate, newTranslate);
+						$moveable.data('translate', moveableTranslate);
+					} else {
+						collisionObject.moveable = false;
+						game.shunt.shunting = false;
+						game.shunt.shuntStop = [newPlayerPos.x, newPlayerPos.y];
+						game.dropMoveable(game.shunt.objectName, game.shunt.dir);
+					}
+					
 				};
 						
 			};
@@ -766,40 +799,36 @@
 				moveableTranslate = $moveable.data('translate'),
 				collisionObject = game.collisionObjects[objectName],
 				distanceShunted = {
-					x: game.shunt.shuntStop[0] - game.shunt.shuntStart[0],
-					y: game.shunt.shuntStop[1] - game.shunt.shuntStart[1]
+					x: shuntDir == 'left' ? Math.floor((game.shunt.shuntStop[0] - game.shunt.shuntStart[0]) * 10) / 10 : Math.ceil((game.shunt.shuntStop[0] - game.shunt.shuntStart[0]) * 10) / 10,
+					y: shuntDir == 'down' ? Math.floor((game.shunt.shuntStop[1] - game.shunt.shuntStart[1]) * 10) / 10 : Math.ceil((game.shunt.shuntStop[1] - game.shunt.shuntStart[1]) * 10) / 10,
 				};
 				
 			// SNAP TO GRID
 							
 			var newGridPos = {
-					x: shuntDir == 'left' ? Math.floor((moveable.origin[0] + distanceShunted.x) * 10) / 10 : Math.ceil((moveable.origin[0] + distanceShunted.x) * 10) / 10,
-					y: shuntDir == 'down' ? Math.floor((moveable.origin[1] + distanceShunted.y) * 10) / 10 : Math.ceil((moveable.origin[1] + distanceShunted.y) * 10) / 10
+					x: (moveable.origin[0] + distanceShunted.x).toFixed(1) * 1,
+					y: (moveable.origin[1] + distanceShunted.y).toFixed(1) * 1
 				},
 				newTranslate = {
-					x: newGridPos.x * game.tile,
-					y: -newGridPos.y * game.tile
-				},
-				newTransformCSS = game.getTransformCSS(newTranslate),
-				cleanDistanceShunted = {
-					x: (newGridPos.x - moveable.origin[0]).toFixed(1) * 1,
-					y: (newGridPos.y - moveable.origin[1]).toFixed(1) * 1
+					x: (newGridPos.x * game.tile).toFixed(1) * 1,
+					y: (-newGridPos.y * game.tile).toFixed(1) * 1
 				};
-				
-			$.extend(moveableTranslate, newTransformCSS);
+	
+			$.extend(moveableTranslate, newTranslate);
+		
+			$moveable.data('translate', moveableTranslate).removeClass('shunted');
 			
-			$moveable.data('translate', moveableTranslate);	
 			
 			// UPDATE MOVEABLE ORIGIN
 			
 			moveable.origin = [newGridPos.x,newGridPos.y];	
 			
 			// UPDATE COLLISION OBJECT
-			
-			collisionObject.absOrigin = {
-				x: collisionObject.absOrigin.x + cleanDistanceShunted.x,
-				y: collisionObject.absOrigin.y + cleanDistanceShunted.y
-			};
+		
+			collisionObject.absOrigin = [
+				(collisionObject.absOrigin[0] + distanceShunted.x).toFixed(1) * 1,
+				(collisionObject.absOrigin[1] + distanceShunted.y).toFixed(1) * 1
+			];
 			
 			for(i = 0; i < 4; i++){
 				var collideDir = 'left'
@@ -832,7 +861,7 @@
 						};
 
 						if(typeof plane[key] !== 'undefined'){
-							plane[key] = (plane[key] + cleanDistanceShunted[axis]).toFixed(1) * 1;
+							plane[key] = (plane[key] + distanceShunted[axis]).toFixed(1) * 1;
 						};
 					}
 					
