@@ -221,7 +221,7 @@
 								"objectName": "Imac1",
 								"width": 1,
 								"origin": [0.5, 0.5],
-								"img": "images/imac.svg"
+								"img": "images/imac_game.svg"
 							},
 							{
 								"objectClass": "imac",
