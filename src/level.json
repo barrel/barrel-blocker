@@ -164,7 +164,16 @@
 						"origin": [15,10],
 						"axis": "y",
 						"length": -10,
-						"background": "url(images/brick3.gif)"
+						"background": "url(images/brick3.gif)",
+						"contents": [
+							{
+								"objectClass": "decoration",
+								"objectName": "poster2",
+								"width": 1,
+								"origin": [4, 0.5],
+								"img": "images/poster2.gif"
+							}
+						]
 					},
 					{
 						"origin": [15,0],
