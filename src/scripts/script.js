@@ -11,7 +11,7 @@
 		speed: 2.5,
 		score: 0,
 		dead: false,
-		timer: 60,
+		timer: 10,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
@@ -1246,6 +1246,9 @@
 			$('body').addClass('gameover');
 			$(window).unbind('keydown');
 			$('#GameOverModal').find('.score').text(game.score);
+			$('#Reset').click(function(){
+				location.reload();
+			});
 		},
 		
 		/*
