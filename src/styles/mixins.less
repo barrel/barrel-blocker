@@ -53,6 +53,15 @@
 	-ms-interpolation-mode: nearest-neighbor;
 }
 
+.pseudo-border(@width, @color) {
+	&:after {
+		content: "";
+		.fill-container;
+		.box-sizing(border-box);
+		border: @width solid @color;
+	}
+}
+
 
 // CSS3 Properties
 // --------------------------------------------------

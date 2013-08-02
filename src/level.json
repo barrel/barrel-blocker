@@ -44,80 +44,104 @@
 					{
 						"origin": [0,6],
 						"axis": "y",
-						"length": 24,
+						"length": 14,
 						"background": "white"
 					},
 					{
-						"origin": [0,30],
+						"origin": [0,20],
 						"axis": "x",
-						"length": 15,
-						"background": "url(images/brick2.gif)",
-						"contents": [
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [5, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [8, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [11, 0.5],
-								"img": "images/window.svg"
-							}
-						]
+						"length": 8,
+						"background": "url(images/brick3.gif)"
 					},
 					{
-						"origin": [15,30],
+						"className": "window",
+						"origin": [8,20],
+						"axis": "x",
+						"length": 1
+					},
+					{
+						"origin": [9,20],
+						"axis": "x",
+						"length": 1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [10,20],
+						"axis": "x",
+						"length": 1
+					},
+					{
+						"origin": [11,20],
+						"axis": "x",
+						"length": 1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [12,20],
+						"axis": "x",
+						"length": 1
+					},
+					{
+						"origin": [13,20],
+						"axis": "x",
+						"length": 2,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"origin": [15,20],
 						"axis": "y",
-						"length": -30,
-						"background": "url(images/brick2.gif)",
-						"contents": [
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [3, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [6, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [9, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [12, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [15, 0.5],
-								"img": "images/window.svg"
-							}
-						]
+						"length": -3,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,17],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,16],
+						"axis": "y",
+						"length": -1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,15],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,14],
+						"axis": "y",
+						"length": -1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,13],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,12],
+						"axis": "y",
+						"length": -1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,11],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,10],
+						"axis": "y",
+						"length": -10,
+						"background": "url(images/brick3.gif)"
 					},
 					{
 						"origin": [15,0],
@@ -127,7 +151,7 @@
 					}
 				],
 				"floor": {
-					"background" : "url(images/floor2.gif)"
+					"background" : "url(images/floor3.gif)"
 				},
 				"furniture": [
 					{
@@ -143,161 +167,6 @@
 							"back": "url(images/countertop.gif)",
 							"right": "url(images/countertop.gif)",
 							"bottom": "url(images/countertop.gif)"
-						},
-						"contents": [
-							{
-								"objectClass": "food",
-								"objectName": "sandwich",
-								"width": 1,
-								"origin": [1.5, 0.5],
-								"img": "images/sandwich.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "bananas",
-								"width": 0.5,
-								"origin": [0.5, 0.5],
-								"img": "images/bananas.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "orange",
-								"width": 0.25,
-								"origin": [0.25, 0.25],
-								"img": "images/orange.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "orange",
-								"width": 0.25,
-								"origin": [0.45, 0.15],
-								"img": "images/orange.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "beer",
-								"width": 0.25,
-								"origin": [5, 0.25],
-								"img": "images/beer.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "beer",
-								"width": 0.25,
-								"origin": [5.25, 0.5],
-								"img": "images/beer.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "beer",
-								"width": 0.25,
-								"origin": [4.75, 0.5],
-								"img": "images/beer.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "chips",
-								"width": 0.5,
-								"origin": [0.1, 0.6],
-								"img": "images/chips.svg"
-							},
-							{
-								"objectClass": "food",
-								"objectName": "yogurt",
-								"width": 0.4,
-								"origin": [4, 0.75],
-								"img": "images/yogurt.svg"
-							}
-						]
-					},
-					{
-						"objectClass": "desk",
-						"objectName": "Desk1",
-						"shape": "cuboid",
-						"moveable": false,
-						"dimensions": [2,4,1],
-						"origin": [5,20],
-						"skin": {
-							"top": "white",
-							"left": "none",
-							"back": "url(images/desk_legs.svg)",
-							"right": "none",
-							"bottom": "url(images/desk_legs.svg)"
-						}
-					},
-					{
-						"objectClass": "desk",
-						"objectName": "Desk2",
-						"shape": "cuboid",
-						"moveable": false,
-						"dimensions": [2,4,1],
-						"origin": [10,20],
-						"skin": {
-							"top": "white",
-							"left": "none",
-							"back": "url(images/desk_legs.svg)",
-							"right": "none",
-							"bottom": "url(images/desk_legs.svg)"
-						}
-					},
-					{
-						"objectClass": "desk",
-						"objectName": "Desk3",
-						"shape": "cuboid",
-						"moveable": false,
-						"dimensions": [2,4,1],
-						"origin": [5,15],
-						"skin": {
-							"top": "white",
-							"left": "none",
-							"back": "url(images/desk_legs.svg)",
-							"right": "none",
-							"bottom": "url(images/desk_legs.svg)"
-						}
-					},
-					{
-						"objectClass": "desk",
-						"objectName": "Desk4",
-						"shape": "cuboid",
-						"moveable": false,
-						"dimensions": [2,4,1],
-						"origin": [10,15],
-						"skin": {
-							"top": "white",
-							"left": "none",
-							"back": "url(images/desk_legs.svg)",
-							"right": "none",
-							"bottom": "url(images/desk_legs.svg)"
-						}
-					},
-					{
-						"objectClass": "desk",
-						"objectName": "Desk5",
-						"shape": "cuboid",
-						"moveable": false,
-						"dimensions": [2,4,1],
-						"origin": [5,10],
-						"skin": {
-							"top": "white",
-							"left": "none",
-							"back": "url(images/desk_legs.svg)",
-							"right": "none",
-							"bottom": "url(images/desk_legs.svg)"
-						}
-					},
-					{
-						"objectClass": "desk",
-						"objectName": "Desk6",
-						"shape": "cuboid",
-						"moveable": false,
-						"dimensions": [2,4,1],
-						"origin": [10,10],
-						"skin": {
-							"top": "white",
-							"left": "none",
-							"back": "url(images/desk_legs.svg)",
-							"right": "none",
-							"bottom": "url(images/desk_legs.svg)"
 						}
 					},
 					{
@@ -306,22 +175,61 @@
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.5,0.5,0.5],
-						"origin": [7,1.5],
+						"origin": [7,10],
 						"skin": {
-							"top": "#F7468A",
-							"left": "#F7468A",
-							"back": "#F7468A",
-							"right": "#F7468A",
-							"bottom": "#F7468A"
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
 						}
 					}
 				]
+			},
+			{
+				"roomname": "atrium",
+				"origin": [5,5],
+				"walls": [
+					{
+						"origin": [-2,0],
+						"axis": "y",
+						"length": 6,
+						"background": "white"
+					},
+					{
+						"origin": [-2,6],
+						"axis": "x",
+						"length": 3,
+						"background": "white"
+					},
+					{
+						"origin": [1,6],
+						"axis": "x",
+						"length": 2,
+						"background": "none"
+					},
+					{
+						"origin": [3,6],
+						"axis": "y",
+						"length": -6,
+						"background": "none"
+					},
+					{
+						"origin": [3,0],
+						"axis": "x",
+						"length": -5,
+						"background": "none"
+					}
+				],
+				"floor": {
+					"background" : "url(images/floor3.gif)"
+				}
 			}
 		],
 		"npcs": [
 			{
 				"type": "coworker",
-				"startPos": [12.5, 26],
+				"startPos": [12.5, 10],
 				"moves": [
 					{
 						"dir": "down",
