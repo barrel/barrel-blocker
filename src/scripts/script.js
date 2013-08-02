@@ -12,8 +12,6 @@
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		cameraAngle: 60,
-		cameraPerspective: 2000,
 		world: {
 			width: null,
 			height: null
@@ -22,7 +20,13 @@
 		camera: {
 			x: null,
 			y: null,
-			z: null
+			z: null,
+			rotation: {
+				x: 75,
+				y: 0,
+				z: 0
+			},
+			perspective: 2000
 		},
 		characters: {
 			player: {
@@ -101,13 +105,13 @@
 						x: game.levelData.startPos[0],
 						y: game.levelData.startPos[1]
 					});
-					game.camera = {
+					$.extend(game.camera, {
 						x: game.tile * ((game.levelData.world.width / 2) - game.characters.player.x),
 						y: -game.tile * ((game.levelData.world.length / 2) - game.characters.player.y),
 						z: 0
-					};
+					});
 					
-					var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
+					var cameraTransform = game.getTransformCSS(game.camera, game.camera.rotation);
 					
 					game.$world.css({
 						width: game.world.width+'px',
@@ -116,7 +120,7 @@
 					}).css(cameraTransform);
 
 					$('body').css({
-						perspective: game.cameraPerspective+'px'
+						perspective: game.camera.perspective+'px'
 					});
 
 					game.renderEnvironment();
@@ -184,9 +188,21 @@
 						negative = -wall.length > 0 ? true : false,
 						className = (negative ? ' negative' : '') + (wall.backfaceVisible ? ' backface' : '') + (wall.portal ? ' portal' : ''),
 						pxLength = negative ? -wall.length : wall.length,
-						$wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background: '+wall.background+'"/>').appendTo($room),
 						translate = {},
 						rotate = {};
+
+					if(wall.className) {
+						className += ' '+wall.className;
+					}	
+
+					var $wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background: '+wall.background+'"/>').appendTo($room);
+
+					if(wall.isWindow) {
+						$wall.css({
+							'background-image': wall.background,
+							'background': 'none'
+						}).addClass('window');
+					}
 						
 					$wall.css({
 						width: game.tile * pxLength+'px',
@@ -422,19 +438,21 @@
 
 			// RENDER AND PLACE PLAYER
 			
-			game.$player = $('<div class="char player"><div class="avatar"/></div>').appendTo(game.$world);
-			var $avatar = game.$player.find('.avatar');
+			game.$player = $('<div class="char player"><div class="avatar"><div class="face y-plane"></div><div class="face x-plane"><span class="eyes"></span></div><div class="face y-plane negative"></div><div class="face x-plane negative"></div></div></div>').appendTo(game.$world);
 
-			$.each(game.characters.player.images, function(key, value){
-					if(key == 'foot') {
-						var img = '<img class="'+key+'" src="'+value+'">';
-						$avatar.append('<div class="feet">'+img+img+'</div>');
-					} else {
-						$avatar.append('<img class="'+key+'" src="'+value+'">');
-					}
-			});
+			var playerSkin = {
+				top: '#332115',
+				left: '#557ffb',
+				back: '#557ffb',
+				right: '#557ffb',
+				bottom: '#f6b597'
+			}
 
-			game.$player.find('.avatar').append('<img class="" src="">')
+			game.$player.find('.avatar').css('background', playerSkin.top)
+				.find('.x-plane:not(.negative)').css('background', playerSkin.bottom)
+				.siblings('.x-plane.negative').css('background', playerSkin.back)
+				.siblings('.y-plane:not(.negative)').css('background', playerSkin.left)
+				.siblings('.y-plane.negative').css('background', playerSkin.right);
 
 			$.extend(game.characters.player,{ 
 				dir: 'up',
@@ -514,11 +532,17 @@
 						
 					if(!keystates[key]){
 							keystates[key] = true;
+
+							game.$player.removeClass('left-to-up up-to-left');
+
+							if(key == 'up' && game.$player.is('.left')) {
+								game.$player.addClass('left-to-up');
+							} else if((key == 'left' && game.$player.is('.up'))) {
+								game.$player.addClass('up-to-left');
+							}
+
 							game.$player.removeClass('up down left right').addClass(key);
 							game.characters.player.dir = key;
-							/*game.movements[key] = setInterval(function(){
-								game.move(key);
-					 		},1000/game.framerate);*/
 					};
 				},
 				keyup: function(e){
@@ -526,7 +550,6 @@
 					
 					if(keystates[key]){
 						keystates[key] = false;
-						//clearInterval(game.movements[key]);
 					};
 				}
 			});
@@ -558,6 +581,11 @@
 				// REDRAW PLAYER
 
 				var playerTransform = game.getTransformCSS(game.$player.data('translate'));
+				var playerRotation = {
+					x: 0,
+					y: 0,
+					z: 0
+				}
 
 				game.$player.css(playerTransform);
 
@@ -579,7 +607,7 @@
 
 				// REDRAW CAMERA
 
-				var cameraTransform = game.getTransformCSS(game.camera, {x: game.cameraAngle, y: 0, z: 0});
+				var cameraTransform = game.getTransformCSS(game.camera, game.camera.rotation);
 
 				game.$world.css(cameraTransform);
 
@@ -688,7 +716,7 @@
 					x: newPlayerPos.x,
 					y: newPlayerPos.y
 				});
-				game.camera = newCameraPos;
+				$.extend(game.camera, newCameraPos);
 				game.currentRoom = game.detectRoom(game.characters.player);
 				game.$player.attr('data-room',game.currentRoom.roomname);
 				game.moveCharacter(game.characters.player);
