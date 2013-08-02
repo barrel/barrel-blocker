@@ -31,8 +31,8 @@
 				x: null,
 				y: null,
 				bb: {
-					width: .5,
-					height: .5
+					width: 1,
+					height: 1
 				},
 				images: {
 					body: 'images/scott.svg',
@@ -648,22 +648,17 @@
 				newPlayerPos.x = (game.characters.player.x + distance);
 				newCameraPos.x -= distance * (game.tile / 2);
 			};
-
-			if(dirX || dirY) {
-				game.$player.addClass('walking');
-			} else {
-				game.$player.removeClass('walking');
-			}
 			
 			distanceMoved = {
 				x: newPlayerPos.x - game.characters.player.x,
 				y: newPlayerPos.y - game.characters.player.y
 			};
 			
-			// DROP MOVEABLE OBJECT IF SHUNTING
+			// DROP MOVEABLE OBJECT IF SHUNTING AND DIRECTION REVERSES
 			
 			if(game.shunt.shunting){
 				if(direction != game.shunt.dir){
+					console.info('dropping')
 					game.shunt.shunting = false;
 					game.shunt.shuntStop = [newPlayerPos.x, newPlayerPos.y];
 					game.dropMoveable(game.shunt.objectName, game.shunt.dir);
@@ -677,14 +672,15 @@
 			};
 			
 			if(dirX || dirY){
-				var collisionX = game.detectCollision(newPlayerPos, dirX, game.characters.player.bb),
-					collisionY = game.detectCollision(newPlayerPos, dirY, game.characters.player.bb);
-					
-				if(collisionX.collided){
-					collision = collisionX;
-				} else if(collisionY.collided){
-					collision = collisionY;
-				};
+				game.$player.addClass('walking');
+				
+				collision = game.detectCollision(newPlayerPos, dirX, game.characters.player.bb);
+				if(!collision.collided){
+					collision = game.detectCollision(newPlayerPos, dirY, game.characters.player.bb);
+				}
+			
+			} else {
+				game.$player.removeClass('walking');
 			};
 			
 			function moveAlong(){
@@ -729,9 +725,9 @@
 				
 			// IF MOVEABLE OBJECT 
 			
-			if(collision.collided && collision.moveable || game.shunt.shunting){
+			if(collision.collided && collision.moveable){
 				
-				var collisionObject = game.collisionObjects[collision.collidedWith] || game.collisionObjects[game.shunt.objectName],
+				var collisionObject = game.collisionObjects[collision.collidedWith],
 					$moveable = $(collisionObject.domNode),
 					moveableTranslate = $moveable.data('translate');
 				
@@ -741,87 +737,71 @@
 						shunting: true,
 						objectName: collision.collidedWith,
 						dir: direction,
-						shuntStart: [newPlayerPos.x, newPlayerPos.y]
-					};	
+						shuntStart: [newPlayerPos.x, newPlayerPos.y],
+						collisionData: game.collisionObjects[collision.collidedWith]
+					};
 					
-					$moveable.addClass('shunting');
+					// REMOVE OBJECT FROM COLLISIONOBJECTS
 					
-					// LOCK OBJECT TO PLAYER 
-				} else {
+					delete game.collisionObjects[collision.collidedWith];
 					
-					// CHECK FOR COLLISIONS ON MOVEABLE OBJECT WHILE PUSHING
+					// CALCULATE TRANSLATE VALUES FOR WITHIN CHARACTER
 					
+					var newTranslate = {},
+						offset;
 					
-					var increment = direction == 'right' || direction == 'left' ? distanceMoved.x : -distanceMoved.y,
-						axis = direction == 'right' || direction == 'left' ? 'x' : 'y',
-						newTranslate = {};
-						
-					var collisionOrigin = {}
-					if(axis == 'x'){
-						collisionOrigin.x = direction == 'right' ? newPlayerPos.x + game.characters.player.bb.width : newPlayerPos.x - game.moveables[game.shunt.objectName].bb.width,
-						collisionOrigin.y = newPlayerPos.y
+					if(direction == 'left' || direction == 'right'){
+						offset = game.shunt.collisionData.absOrigin[1] - game.characters.player.y;
+						newTranslate = {
+							x: direction == 'right' ? game.characters.player.bb.width * game.tile : -game.moveables[collision.collidedWith].bb.width * game.tile,
+							y: -offset * game.tile,
+							z: 50
+						};
 					} else {
-						collisionOrigin.y = direction == 'up' ? newPlayerPos.y + game.characters.player.bb.height : newPlayerPos.y - game.moveables[game.shunt.objectName].bb.height,
-						collisionOrigin.x = newPlayerPos.x
+						offset = game.shunt.collisionData.absOrigin[0] - game.characters.player.x;
+						newTranslate = {
+							x: offset * game.tile,
+							y: direction == 'up' ? -game.characters.player.bb.height * game.tile : game.moveables[collision.collidedWith].bb.height * game.tile,
+							z: 50
+						}
 					}
-
-					var moveableCollision = game.detectCollision(
-										collisionOrigin, 
-										direction, 
-										game.moveables[game.shunt.objectName].bb
-									);			
 						
-					if(!moveableCollision.collided){	
-						moveAlong();
-						
-						newTranslate[axis] = moveableTranslate[axis] + (increment * game.tile);
-						
-						$.extend(moveableTranslate, newTranslate);
-						$moveable.data('translate', moveableTranslate);
-					} else {
-						collisionObject.moveable = false;
-						game.shunt.shunting = false;
-						game.shunt.shuntStop = [newPlayerPos.x, newPlayerPos.y];
-						game.dropMoveable(game.shunt.objectName, game.shunt.dir);
-					}
+					$moveable.data('translate',newTranslate);
 					
+					// APPEND OBJECT TO CHARACTER
+					
+				
+					
+					game.$player.append($moveable);
 				};
 						
 			};
 					
-			game.moveNPCs();
+			//game.moveNPCs();
 		},
 		
 		dropMoveable: function(objectName, shuntDir){
 
 			var $moveable = $('#'+objectName),
+				$room = $(game.currentRoom.domNode),
 				moveable = game.moveables[objectName],
-				moveableTranslate = $moveable.data('translate'),
-				collisionObject = game.collisionObjects[objectName],
+				moveableTranslate = $moveable.data('translate');
+				
+			// APPEND OBJECT TO ROOM 
+				
+			$room.append($moveable);
+			
+			// RE-ADD TO COLLISION OBJECT
+			
+			game.collisionObjects[objectName] = game.shunt.collisionData;
+				
+			// CALCULATE DISTANCE MOVED	
+				
+			var collisionObject = game.collisionObjects[objectName],
 				distanceShunted = {
 					x: shuntDir == 'left' ? Math.floor((game.shunt.shuntStop[0] - game.shunt.shuntStart[0]) * 10) / 10 : Math.ceil((game.shunt.shuntStop[0] - game.shunt.shuntStart[0]) * 10) / 10,
 					y: shuntDir == 'down' ? Math.floor((game.shunt.shuntStop[1] - game.shunt.shuntStart[1]) * 10) / 10 : Math.ceil((game.shunt.shuntStop[1] - game.shunt.shuntStart[1]) * 10) / 10,
 				};
-				
-			// SNAP TO GRID
-							
-			var newGridPos = {
-					x: (moveable.origin[0] + distanceShunted.x).toFixed(1) * 1,
-					y: (moveable.origin[1] + distanceShunted.y).toFixed(1) * 1
-				},
-				newTranslate = {
-					x: (newGridPos.x * game.tile).toFixed(1) * 1,
-					y: (-newGridPos.y * game.tile).toFixed(1) * 1
-				};
-	
-			$.extend(moveableTranslate, newTranslate);
-		
-			$moveable.data('translate', moveableTranslate).removeClass('shunted');
-			
-			
-			// UPDATE MOVEABLE ORIGIN
-			
-			moveable.origin = [newGridPos.x,newGridPos.y];	
 			
 			// UPDATE COLLISION OBJECT
 		
@@ -867,6 +847,26 @@
 					
 				}
 			};
+			
+			// SNAP TO GRID
+			
+			var roomOffset = game.rooms[game.currentRoom.roomname].absOrigin,
+				newGridPos = {
+					x: (collisionObject.absOrigin[0] - roomOffset[0]).toFixed(1) * 1,
+					y: (collisionObject.absOrigin[1] - roomOffset[1]).toFixed(1) * 1,
+				},
+				newTranslate = {
+					x: (newGridPos.x * game.tile).toFixed(1) * 1,
+					y: (-newGridPos.y * game.tile).toFixed(1) * 1
+				};
+	
+			$.extend(moveableTranslate, newTranslate);
+		
+			$moveable.data('translate', moveableTranslate).removeClass('shunted');
+			
+			// UPDATE MOVEABLE ORIGIN
+			
+			moveable.origin = [newGridPos.x,newGridPos.y];
 		
 		},
 
@@ -966,27 +966,28 @@
 		*/
 		
 		detectCollision: function(position, direction, bb){
-			
+		
 			var collision = {
 					collided: false
 				},
-				collideAt = {};
+				collideAt = {},
+				axis = (direction == 'right' || direction == 'left') ? 'x' : 'y',
+				perpAxis = axis == 'x' ? 'y' : 'x';
 				
 			if(typeof direction === 'undefined'){
 				return collision;
 			};
 	
-			collideAt.x = direction == 'right' ? Math.ceil((position.x + bb.width) * 10) / 10 : Math.floor(position.x * 10 ) / 10, 
-			collideAt.y = direction == 'up' ? Math.ceil((position.y + bb.height) * 10) / 10 : Math.floor(position.y * 10 ) / 10,
+			collideAt.x = direction == 'right' ? Math.floor((position.x + bb.width) * 10) / 10 : Math.ceil(position.x * 10 ) / 10, 
+			collideAt.y = direction == 'up' ? Math.floor((position.y + bb.height) * 10) / 10 : Math.ceil(position.y * 10 ) / 10,
 			offset = (direction == 'right' || direction == 'left') ? bb.height : bb.width;
-			
+	
 			$.each(game.collisionObjects, function(){
 				var collisionObject = this;
 				
 				for(i = 0; i < collisionObject[direction].length; i++){
 					var collisionPlane = collisionObject[direction][i],
-						axis = (direction == 'right' || direction == 'left') ? 'x' : 'y',
-						perpAxis = axis == 'x' ? 'y' : 'x';
+						errorMargin = 0.1;
 					
 					if(
 						 
@@ -1004,11 +1005,11 @@
 						
 							// CHECK IF CHARACTER INTERSECTS EITHER PERPENDICULAR THRESHOLD
 						
-							(collideAt[perpAxis] < collisionPlane[perpAxis+'Min'] && 
-							collideAt[perpAxis] + offset - 0.1 > collisionPlane[perpAxis+'Min']) ||
+							(collisionPlane[perpAxis+'Min'] > collideAt[perpAxis] && 
+							collisionPlane[perpAxis+'Min'] < collideAt[perpAxis] + offset) ||
 						
-							(collideAt[perpAxis] < collisionPlane[perpAxis+'Max'] && 
-							collideAt[perpAxis] + offset - 0.1 > collisionPlane[perpAxis+'Max'])
+							(collisionPlane[perpAxis+'Max'] > collideAt[perpAxis] && 
+							collisionPlane[perpAxis+'Max'] < collideAt[perpAxis] + offset)
 						)
 						
 					){
@@ -1016,8 +1017,11 @@
 						$.extend(collision, {
 							collided: true,
 							collidedWith: collisionObject.objectName,
+							planeData: collisionPlane,
 							moveable: collisionObject.moveable,
-							objectType: collisionObject.objectType
+							objectType: collisionObject.objectType,
+							collidedAt: collideAt,
+							collideDir: direction
 						});
 						return collision;
 					};
@@ -1053,7 +1057,7 @@
 			
 			return {
 				roomname: game.floorTiles[index].parentRoom,
-				domNode: game.floorTiles[index].domNode
+				domNode: game.floorTiles[index].parentdomNode
 			};
 		},
 		
