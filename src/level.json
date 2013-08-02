@@ -196,6 +196,7 @@
 					{
 						"objectClass": "stool",
 						"objectName": "Stool1",
+						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.75,0.75,0.75],
@@ -211,10 +212,11 @@
 					{
 						"objectClass": "bad-stool",
 						"objectName": "Enemy1",
+						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.75,0.75,0.75],
-						"origin": [10,10],
+						"origin": [10,8],
 						"skin": {
 							"top": "none",
 							"left": "none",
@@ -226,6 +228,7 @@
 					{
 						"objectClass": "bad-stool",
 						"objectName": "Enemy2",
+						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.75,0.75,0.75],
@@ -277,6 +280,40 @@
 				],
 				"floor": {
 					"background" : "url(images/floor3.gif)"
+				}
+			},
+			{
+				"roomname": "cellar",
+				"roomClass": "pit",
+				"origin": [15,15],
+				"walls": [
+					{
+						"origin": [0,0],
+						"axis": "y",
+						"length": 2,
+						"background": "none"
+					},
+					{
+						"origin": [0,2],
+						"axis": "x",
+						"length": 2,
+						"background": "none"
+					},
+					{
+						"origin": [2,2],
+						"axis": "y",
+						"length": -2,
+						"background": "none"
+					},
+					{
+						"origin": [2,0],
+						"axis": "x",
+						"length": -2,
+						"background": "none"
+					}
+				],
+				"floor": {
+					"background" : "#000"
 				}
 			}
 		]
