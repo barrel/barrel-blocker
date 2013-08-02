@@ -174,7 +174,7 @@
 						"objectName": "Stool1",
 						"shape": "cuboid",
 						"moveable": true,
-						"dimensions": [0.5,0.5,0.5],
+						"dimensions": [0.75,0.75,0.75],
 						"origin": [7,10],
 						"skin": {
 							"top": "none",
@@ -225,35 +225,6 @@
 					"background" : "url(images/floor3.gif)"
 				}
 			}
-		],
-		"npcs": [
-			{
-				"type": "coworker",
-				"startPos": [12.5, 10],
-				"moves": [
-					{
-						"dir": "down",
-						"speed": "normal",
-						"time": 1000
-					},
-					{
-						"dir": "right",
-						"speed": "normal",
-						"time": 1000
-					},
-					{
-						"dir": "left",
-						"speed": "normal",
-						"time": 1000
-					},
-					{
-						"dir": "up",
-						"speed": "normal",
-						"time": 1000
-					}
-				]
-			}
 		]
-		
 	}
 }
