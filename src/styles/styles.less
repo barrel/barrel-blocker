@@ -440,6 +440,27 @@ body {
 
 #SplashPage {
 	text-align: center;
+
+	&.show-logos {
+		.splash-logo {
+			.transform(none);
+		}
+	}
+
+	.splash-logo {
+		.fill-container;
+		background: #252528;
+		z-index: 100;
+		.transition(1s);
+		.transform(translateY(100%));
+	}
+
+	#WWWLogo {
+		.transition-delay(2s);
+		img {
+			.absolute-center(402px, 486px);
+		}
+	}
 }
 
 .splash-section {
@@ -512,4 +533,47 @@ body {
 
 #Credits {
 	.absolute-center(2000px, 500px);
+}
+
+#GameOverModal {
+	display: none;
+	.gameover & {
+		display: block;
+	}
+	position: absolute;
+	top: 50%; height: 600px;
+	margin-top: -300px;
+	width: 100%;
+	background: fadeOut(black, 15%);
+	color: white;
+	text-align: center;
+
+	h1 {
+		font-size: 50px;
+		margin-top: 100px;
+		margin-bottom: 150px;
+	}
+
+	p {
+		color: #666666;
+		margin: 0; padding: 0;
+	}
+
+	.score {
+		font-size: 50px;
+		color: #67c447;
+		padding-top: 20px;
+		padding-bottom: 100px;
+	}
+
+	.reset-btn {
+		font-size: 22px;
+		margin: 50px 0;
+		color: inherit;
+		text-decoration: none;
+		border: 5px solid white;
+		border-radius: 5px;
+		padding: 10px;
+		padding-bottom: 5px;
+	}
 }
