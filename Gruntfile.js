@@ -83,7 +83,7 @@ module.exports = function(grunt) {
 						'*.{html,txt,htaccess,json,hbs}',
 						'**/*.{png,jpg,gif,svg,ico}',
 						'**/*.{eot,ttf,woff}',
-						'**/*.{mp3}'
+						'**/*.mp3'
 					]
 				}]
 			}
