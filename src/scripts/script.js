@@ -12,8 +12,8 @@
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
-		cameraAngle: 75,
-		cameraPerspective: 2500,
+		cameraAngle: 60,
+		cameraPerspective: 2000,
 		world: {
 			width: null,
 			height: null
@@ -49,10 +49,7 @@
 			shuntEnd: [0,0]
 		},
 		currentRoom: null,
-		collisionMatrix: {
-			x: {},
-			y: {}
-		},
+		collisionObjects: {},
 		floorTiles: [],
 		controls: {
 			keycodes: {
@@ -166,6 +163,20 @@
 					absOrigin: room.origin
 				};
 				
+				// BUILD COLLISION OBJECT 
+				
+				game.collisionObjects[room.roomname] = {
+					domNode: $room[0],
+					absOrigin: room.origin,
+					objectType: 'room',
+					objectName: room.roomname, 
+					moveable: false,
+					left: [],
+					right: [],
+					up: [],
+					down: []
+				};
+				
 				// FOR EACH WALL
 				
 				$.each(room.walls,function(){
@@ -230,7 +241,7 @@
 					
 					// ADD TO COLLISION MATRIX
 					
-					game.pushCollision($wall, wall, room);
+					game.pushToCollisionObject(wall, room, true);
 					
 					// MAP FLOOR TILES
 					
@@ -373,12 +384,7 @@
 					if(furn.moveable){
 						game.moveables[furn.objectName] = {
 							domObj: $furn[0],
-							origin: furn.origin,
-							collisions: collisions,
-							bb: {
-								width: furn.dimensions[0],
-								height: furn.dimensions[1]
-							}
+							origin: furn.origin
 						}
 					};
 
@@ -662,16 +668,19 @@
 			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
-			var collisionX = game.detectCollision(newPlayerPos, dirX, game.characters.player.bb),
-				collisionY = game.detectCollision(newPlayerPos, dirY, game.characters.player.bb),
-				collision = {
-					collided: false
+			var collision = {
+				collided: false
+			};
+			
+			if(dirX || dirY){
+				var collisionX = game.detectCollision(newPlayerPos, dirX, game.characters.player.bb),
+					collisionY = game.detectCollision(newPlayerPos, dirY, game.characters.player.bb);
+					
+				if(collisionX.collided){
+					collision = collisionX;
+				} else if(collisionY.collided){
+					collision = collisionY;
 				};
-				
-			if(collisionX.collided){
-				collision = collisionX;
-			} else if(collisionY.collided){
-				collision = collisionY;
 			};
 			
 			function moveAlong(){
@@ -691,7 +700,7 @@
 			
 			// IF GOING THROUGH A DOOR
 			
-			if(collision.collided && collision.object.objectType == 'portal'){
+			if(collision.collided && collision.objectType == 'portal'){
 				
 				moveAlong();
 				
@@ -716,17 +725,17 @@
 				
 			// IF MOVEABLE OBJECT 
 			
-			if(collision.collided && collision.object.moveable || game.shunt.shunting){
+			if(collision.collided && collision.moveable || game.shunt.shunting){
 				
-				var $moveable = collision.collided ? $('#'+collision.object.parent) : $('#'+game.shunt.objectName),
-					moveable = collision.collided ? game.moveables[collision.object.parent] : game.moveables[game.shunt.objectName],
+				var collisionObject = game.collisionObjects[collision.collidedWith] || game.collisionObjects[game.shunt.objectName],
+					$moveable = $(collisionObject.domNode),
 					moveableTranslate = $moveable.data('translate');
 				
 				if(!game.shunt.shunting){
 				
 					game.shunt = {
 						shunting: true,
-						objectName: collision.object.parent,
+						objectName: collision.collidedWith,
 						dir: direction,
 						shuntStart: [newPlayerPos.x, newPlayerPos.y]
 					};	
@@ -743,7 +752,7 @@
 						
 					$.extend(moveableTranslate, newTranslate);
 					$moveable.data('translate', moveableTranslate);
-				};	
+				};
 						
 			};
 					
@@ -755,6 +764,7 @@
 			var $moveable = $('#'+objectName),
 				moveable = game.moveables[objectName],
 				moveableTranslate = $moveable.data('translate'),
+				collisionObject = game.collisionObjects[objectName],
 				distanceShunted = {
 					x: game.shunt.shuntStop[0] - game.shunt.shuntStart[0],
 					y: game.shunt.shuntStop[1] - game.shunt.shuntStart[1]
@@ -784,67 +794,51 @@
 			
 			moveable.origin = [newGridPos.x,newGridPos.y];	
 			
-			// REPLACE COLLISION MATRIX DATA
+			// UPDATE COLLISION OBJECT
 			
-			var iterations = (shuntDir == 'right' || shuntDir == 'left') ? [1,3] : [0,2];
-			
-			for(var i = 0; i < moveable.collisions.length; i++){
-				
-				var indices = moveable.collisions[i],
-					axis = indices[0],
-					perpAxis = axis == 'x' ? 'y' : 'x',
-					collideAt = indices[1],
-					entryIndex = indices[2],
-					data = game.collisionMatrix[axis][collideAt][entryIndex],
-					roomOrigin = game.rooms[game.currentRoom.roomname].absOrigin,
-					newAbsGridPos = {
-						x: newGridPos.x + roomOrigin[0],
-						y: newGridPos.y + roomOrigin[1]
-					}
-					offset = 0;
-				
-				if(i == iterations[0] || i == iterations[1]){
-					
-					if(i == 2){
-						offset = moveable.bb.width;
-					} else if(i == 3) {
-						offset = moveable.bb.height;
-					};
-					
-					// REMOVE OLD ENTRIES
-					
-					if(game.collisionMatrix[axis][collideAt].length == 1){
-						delete game.collisionMatrix[axis][collideAt];
-					} else {
-						game.collisionMatrix[axis][collideAt][entryIndex][perpAxis+'Min'] = false;
-						game.collisionMatrix[axis][collideAt][entryIndex][perpAxis+'Max'] = false;
-					};	
-			
-					// ADD NEW ENTRIES
-
-					if(typeof game.collisionMatrix[axis][newAbsGridPos[axis] + offset] == 'undefined'){
-						game.collisionMatrix[axis][newAbsGridPos[axis] + offset] = [];
-					};
-
-					game.collisionMatrix[axis][newAbsGridPos[axis] + offset].push(data);
-			
-					// UPDATE INDICES
-			
-					moveable.collisions[i][1] = newAbsGridPos[axis];
-					moveable.collisions[i][2] = game.collisionMatrix[axis][newAbsGridPos[axis] + offset].length - 1;
-				
-				};
-				
-				if(i == iterations[1] || i == iterations[3]){
-					game.collisionMatrix[axis][collideAt][entryIndex][axis+'Min'] = data[axis+'Min'] + cleanDistanceShunted[axis];
-					game.collisionMatrix[axis][collideAt][entryIndex][axis+'Max'] = data[axis+'Max'] + cleanDistanceShunted[axis];
-				};
-			
+			collisionObject.absOrigin = {
+				x: collisionObject.absOrigin.x + cleanDistanceShunted.x,
+				y: collisionObject.absOrigin.y + cleanDistanceShunted.y
 			};
 			
-			
-			
-			console.info(game.collisionMatrix);
+			for(i = 0; i < 4; i++){
+				var collideDir = 'left'
+					axis = (game.shunt.dir == 'right' || game.shunt.dir == 'left') ? 'x' : 'y';
+				
+				switch(i){
+					case 1:
+						collideDir = 'right';
+						break;
+					case 2:
+						collideDir = 'up';
+						break;
+					case 3:
+						collideDir = 'down';
+						break;
+				};
+				
+				for(j = 0; j < collisionObject[collideDir].length; j++){
+					var plane = collisionObject[collideDir][j],
+						key = axis;
+					
+					for(k = 0; k < 3; k++){
+						switch(k){
+							case 1:
+								key = axis+'Min';
+								break;
+							case 2:
+								key = axis+'Max';
+								break;
+						};
+
+						if(typeof plane[key] !== 'undefined'){
+							plane[key] = (plane[key] + cleanDistanceShunted[axis]).toFixed(1) * 1;
+						};
+					}
+					
+				}
+			};
+		
 		},
 
 		/*
@@ -939,7 +933,7 @@
 		*	@arge: bb / bounding box width+height array
 		* 	return collision object
 		*
-		*	Checks player position against all objects in collision matrix on perpendicular axis.
+		*	Checks player position against all objects in collision matrix
 		*/
 		
 		detectCollision: function(position, direction, bb){
@@ -948,48 +942,62 @@
 					collided: false
 				},
 				collideAt = {};
+				
+			if(typeof direction === 'undefined'){
+				return collision;
+			};
 	
 			collideAt.x = direction == 'right' ? Math.ceil((position.x + bb.width) * 10) / 10 : Math.floor(position.x * 10 ) / 10, 
 			collideAt.y = direction == 'up' ? Math.ceil((position.y + bb.height) * 10) / 10 : Math.floor(position.y * 10 ) / 10,
 			offset = (direction == 'right' || direction == 'left') ? bb.height : bb.width;
-
-			for(i = 0; i < 2; i++){
-				var axis = i == 0 ? 'x' : 'y',
-					perpAxis = i == 0 ? 'y' : 'x';
-				if(typeof game.collisionMatrix[axis][collideAt[axis]] !== 'undefined'){
+			
+			$.each(game.collisionObjects, function(){
+				var collisionObject = this;
 				
-					for(var j = 0; j < game.collisionMatrix[axis][collideAt[axis]].length; j++){
-						var collisionObject = game.collisionMatrix[axis][collideAt[axis]][j];
+				for(i = 0; i < collisionObject[direction].length; i++){
+					var collisionPlane = collisionObject[direction][i],
+						axis = (direction == 'right' || direction == 'left') ? 'x' : 'y',
+						perpAxis = axis == 'x' ? 'y' : 'x';
+					
+					if(
+						 
+						collideAt[axis] == collisionPlane[axis] &&
 						
-						if(
+						(
 							// CHECK IF CHARACTER IS WITHIN PERPENDICULAR THRESHOLDS
-							(collideAt[perpAxis] >= collisionObject[perpAxis+'Min'] && 
-							collideAt[perpAxis] + offset <= collisionObject[perpAxis+'Max']) ||
-							
+							(collideAt[perpAxis] >= collisionPlane[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset <= collisionPlane[perpAxis+'Max']) ||
+						
 							// CHECK IF CHARACTER ENVELOPS PERPENDICULAR THRESHOLDS
-							
-							(collideAt[perpAxis] <= collisionObject[perpAxis+'Min'] && 
-							collideAt[perpAxis] + offset >= collisionObject[perpAxis+'Max']) ||
-							
+						
+							(collideAt[perpAxis] <= collisionPlane[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset >= collisionPlane[perpAxis+'Max']) ||
+						
 							// CHECK IF CHARACTER INTERSECTS EITHER PERPENDICULAR THRESHOLD
-							
-							(collideAt[perpAxis] < collisionObject[perpAxis+'Min'] && 
-							collideAt[perpAxis] + offset - 0.1 > collisionObject[perpAxis+'Min']) ||
-							
-							(collideAt[perpAxis] < collisionObject[perpAxis+'Max'] && 
-							collideAt[perpAxis] + offset - 0.1 > collisionObject[perpAxis+'Max'])
-							
-						){
-							$.extend(collision, {
-								collided: true,
-								object: collisionObject
-							});
-							return collision;
-						};
-					}
+						
+							(collideAt[perpAxis] < collisionPlane[perpAxis+'Min'] && 
+							collideAt[perpAxis] + offset - 0.1 > collisionPlane[perpAxis+'Min']) ||
+						
+							(collideAt[perpAxis] < collisionPlane[perpAxis+'Max'] && 
+							collideAt[perpAxis] + offset - 0.1 > collisionPlane[perpAxis+'Max'])
+						)
+						
+					){
+						
+						$.extend(collision, {
+							collided: true,
+							collidedWith: collisionObject.objectName,
+							moveable: collisionObject.moveable,
+							objectType: collisionObject.objectType
+						});
+						return collision;
+					};
 				};
-			};
+				return collision;
+			});
+			
 			return collision;
+
 		},
 		
 		/*
@@ -1117,7 +1125,21 @@
 				}
 			];
 			
-			var collisions = [];
+			// BUILD COLLISION OBJECT
+			
+			game.collisionObjects[cuboid.objectName] = {
+				domNode: $cuboid[0],
+				absOrigin: [cuboid.origin[0] + room.origin[0], cuboid.origin[1] + room.origin[1]],
+				objectType: 'cuboid',
+				objectName: cuboid.objectName, 
+				moveable: cuboid.moveable,
+				left: [],
+				right: [],
+				up: [],
+				down: []
+			};
+			
+			// FOR EACH FACE
 			
 			$.each(verticalFaces, function(i){
 				var face = this,
@@ -1146,63 +1168,58 @@
 						height: (cuboid.dimensions[2] * game.tile)+'px',
 						marginBottom: ((cuboid.dimensions[1] - cuboid.dimensions[2]) * game.tile)+'px',
 						background: cuboid.skin[face.face]
-					}).css(faceTransform);
+					}).css(faceTransform);	
 					
-					// ADD TO COLLISION MATRIX
-					
-					collisions.push(game.pushCollision($face, face, cuboid, room, $cuboid[0]));
+					game.pushToCollisionObject(face, cuboid, false);		
 				
 			});
-			
-			return collisions;
 
 		},
 		
 		/*
-		*	PUSH COLLISION
-		*	@arg: $plane / jQuery object
-		*	@arg: plane / levelData object
-		*	@arg: parent / parent levelData object
-		*	@arg: parent / grandparent levelData object
-		*
-		*	Pushes plane into collision matrix.
+		*	PUSH TO COLLISION OBJECT
 		*/
 		
-		pushCollision: function($plane, plane, parent, grandparent, parentDomNode){
-			grandparent = grandparent ? grandparent : {origin: [0,0]};
-			var absoluteOrigin = [
-					plane.origin[0] + parent.origin[0] + grandparent.origin[0],
-					plane.origin[1] + parent.origin[1] + grandparent.origin[1]
+		pushToCollisionObject: function(plane, parent, isRoom){
+			var parentName = parent.roomname || parent.objectName,
+				collisionObject = game.collisionObjects[parentName],
+				absoluteOrigin = [
+					plane.origin[0] + collisionObject.absOrigin[0],
+					plane.origin[1] + collisionObject.absOrigin[1]
 				],
-				collideWith = plane.axis == 'x' ? 'y' : 'x',
-				axisPos = plane.axis == 'x' ? 1 : 0,
-				perpAxisPos = plane.axis == 'x' ? 0 : 1;
-		
-			if(typeof game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] === 'undefined'){
-				game.collisionMatrix[collideWith][absoluteOrigin[axisPos]] = [];
+				isNegative = plane.length < 0 ? true : false,
+				axis = plane.axis,
+				perpAxis = axis == 'x' ? 'y' : 'x',
+				axisPos = axis == 'x' ? 1 : 0,
+				perpAxisPos = axis == 'x' ? 0 : 1,
+				planeStart = absoluteOrigin[perpAxisPos],
+				planeEnd = absoluteOrigin[perpAxisPos] + plane.length,
+				collideDir;
+				
+			if(axis == 'y'){
+				if(isRoom){
+					collideDir = isNegative ? 'right' : 'left';
+				} else {
+					collideDir = isNegative ? 'left' : 'right';
+				};
+			} else {
+				if(isRoom){
+					collideDir = isNegative ? 'down' : 'up';
+				} else {
+					collideDir = isNegative ? 'up' : 'down';
+				};
 			};
-		
-			var entry = game.collisionMatrix[collideWith][absoluteOrigin[axisPos]],
-				perpStart = absoluteOrigin[perpAxisPos],
-				perpEnd = absoluteOrigin[perpAxisPos] + plane.length,
-				collisionObject = {
-					objectType: plane.portal ? 'portal' : 'plane',
-					collide: plane.portal ? false : true,
-					domNode: $plane[0],
-					moveable: parent.moveable ? true : false,
-					parent: parent.objectName
+			
+			var collisionData = {
+					portal: plane.portal ? true : false
 				};
+				
+			collisionData[perpAxis] = absoluteOrigin[axisPos];
+			collisionData[axis+'Min'] = planeStart > planeEnd ? planeEnd : planeStart;
+			collisionData[axis+'Max'] = planeStart > planeEnd ? planeStart : planeEnd;
 			
-				if(plane.portal){
-					collisionObject.open = false;
-				};
+			game.collisionObjects[parentName][collideDir].push(collisionData);
 			
-			collisionObject[plane.axis+'Min'] = perpStart > perpEnd ? perpEnd : perpStart;
-			collisionObject[plane.axis+'Max'] = perpStart > perpEnd ? perpStart : perpEnd;
-		
-			var entryIndex = entry.push(collisionObject) -1;
-			
-			return [collideWith,absoluteOrigin[axisPos],entryIndex];
 		},
 		
 		/*
