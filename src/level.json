@@ -193,6 +193,21 @@
 						}
 					},
 					{
+						"objectClass": "desk",
+						"objectName": "Desk1",
+						"shape": "cuboid",
+						"moveable": false,
+						"dimensions": [4,1,1],
+						"origin": [7,15],
+						"skin": {
+							"top": "white",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
 						"objectClass": "plant",
 						"objectName": "Plant",
 						"shape": "cuboid",
