@@ -9,7 +9,10 @@
 	<script src="scripts/script.js"></script>
 	<!-- endbuild -->
 </head>
-<body id="SplashPage">
+<body id="SplashPage" class="show-logos">
+	<div id="WWWLogo" class="splash-logo">
+		<img src="images/www.svg" alt="World Wide Walrus" />
+	</div>
 	<span id="BackButton" class="back-btn section-link" data-section-target="Title">Back</span>
 	<div id="Clouds"></div>
 	<div id="Title" class="splash-section active">
@@ -58,6 +61,7 @@
 			});
 			
 			$('#BackButton').hide();
+			$('#SplashPage').removeClass('show-logos');
 		});
 	</script>
 </body>

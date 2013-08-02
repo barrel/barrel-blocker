@@ -435,6 +435,27 @@ body {
 
 #SplashPage {
 	text-align: center;
+
+	&.show-logos {
+		.splash-logo {
+			.transform(none);
+		}
+	}
+
+	.splash-logo {
+		.fill-container;
+		background: #252528;
+		z-index: 100;
+		.transition(1s);
+		.transform(translateY(100%));
+	}
+
+	#WWWLogo {
+		.transition-delay(2s);
+		img {
+			.absolute-center(402px, 486px);
+		}
+	}
 }
 
 .splash-section {
