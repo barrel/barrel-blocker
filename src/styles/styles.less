@@ -108,7 +108,7 @@ body {
 	padding-top: 1px;
 	left: 0;
 	bottom: 0;
-	border-top: 1px solid transparent;
+	border: 1.5px solid transparent;
 }
 
 @playerRotateX: 90deg;
@@ -292,8 +292,23 @@ body {
 			border-right: (@grid / 5) solid #c42298;
 		}
 		.face {
-			//background: #c42298 !important;
 			.pseudo-border((@grid / 5), #c42298);
+			&:after {
+				border-top: none;
+			}
+		}
+	}
+
+	&.bad-stool {
+		background-color: #7ed95b !important;
+		background-image: url(../images/bad_stool_face.gif) !important;
+		background-position: 50% 50% !important;
+		background-repeat: no-repeat !important;
+		&:after {
+			content: none;
+		}
+		.face {
+			.pseudo-border((@grid / 5), #7ed95b);
 			&:after {
 				border-top: none;
 			}

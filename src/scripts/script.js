@@ -351,6 +351,7 @@
 						quad.origin[1] + room.origin[1]
 					];
 					
+				pos.z = -1;
 				quad.domNode = $floorTile[0];
 				
 				game.rooms[room.roomname].floor.push(quad);
@@ -651,10 +652,38 @@
 				distance = (now - game.updated) / 500 * game.speed,
 				distanceMoved = {},
 				dirX,
-				dirY;
+				dirY,
+				countKeys = 0;
 				
 				game.updated = now;
+			
+			// COUNT KEYS DOWN	
 				
+			if(controls.down)countKeys++;
+			if(controls.up)countKeys++;
+			if(controls.left)countKeys++;
+			if(controls.right)countKeys++;	
+			
+			if(countKeys > 1){
+				controls = {
+					left: false,
+					right: false,
+					up: false,
+					down: false
+				};
+				controls[direction] = true;
+			};	
+			
+			// DROP MOVEABLE OBJECT IF SHUNTING AND DIRECTION REVERSES
+
+			if(game.shunt.shunting){
+				if(game.shunt.dir != direction){
+					game.shunt.shunting = false;
+					game.shunt.shuntStop = [newPlayerPos.x, newPlayerPos.y];
+					game.dropMoveable(game.shunt.objectName, game.shunt.dir);
+					return false;
+				};
+			};	
 			
 			if(controls.up && !controls.down){
 				dirY = 'up';
@@ -683,17 +712,6 @@
 				y: newPlayerPos.y - game.characters.player.y
 			};
 			
-			// DROP MOVEABLE OBJECT IF SHUNTING AND DIRECTION REVERSES
-			
-			if(game.shunt.shunting){
-				if(direction != game.shunt.dir){
-					console.info('dropping')
-					game.shunt.shunting = false;
-					game.shunt.shuntStop = [newPlayerPos.x, newPlayerPos.y];
-					game.dropMoveable(game.shunt.objectName, game.shunt.dir);
-				};
-			};
-			
 			// PASS POSITION TO COLLISION AND ROOM DETECTION
 			
 			var collision = {
@@ -703,9 +721,24 @@
 			if(dirX || dirY){
 				game.$player.addClass('walking');
 				
-				collision = game.detectCollision(newPlayerPos, dirX, game.characters.player.bb);
+				var collisionPos = {
+					x: newPlayerPos.x,
+					y: newPlayerPos.y
+				};
+				
+				if(game.shunt.shunting){
+					if(game.shunt.dir == 'right' || game.shunt.dir == 'left'){
+						collisionPos.x = 	game.shunt.dir == 'right' ? collisionPos.x + game.moveables[game.shunt.objectName].bb.width : 
+											collisionPos.x - game.moveables[game.shunt.objectName].bb.width;
+					} else {
+						collisionPos.y = 	game.shunt.dir == 'up' ? collisionPos.y + game.moveables[game.shunt.objectName].bb.height : 
+											collisionPos.y - game.moveables[game.shunt.objectName].bb.height;
+					};
+				};
+				
+				collision = game.detectCollision(collisionPos, dirX, game.characters.player.bb);
 				if(!collision.collided){
-					collision = game.detectCollision(newPlayerPos, dirY, game.characters.player.bb);
+					collision = game.detectCollision(collisionPos, dirY, game.characters.player.bb);
 				}
 			
 			} else {

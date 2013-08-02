@@ -183,6 +183,36 @@
 							"right": "none",
 							"bottom": "none"
 						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Enemy1",
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.75,0.75,0.75],
+						"origin": [10,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Enemy2",
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.75,0.75,0.75],
+						"origin": [13,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
 					}
 				]
 			},
