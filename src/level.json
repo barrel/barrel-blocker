@@ -45,7 +45,21 @@
 						"origin": [0,6],
 						"axis": "y",
 						"length": 14,
-						"background": "white"
+						"background": "white",
+						"contents": [
+							{
+								"objectClass": "decoration door",
+								"objectName": "WC1",
+								"width": 2,
+								"origin": [4,0]
+							},
+							{
+								"objectClass": "decoration door",
+								"objectName": "WC2",
+								"width": 2,
+								"origin": [9,0]
+							}
+						]
 					},
 					{
 						"origin": [0,20],
@@ -171,12 +185,43 @@
 						"dimensions": [6,1,1],
 						"origin": [5,2],
 						"skin": {
-							"top": "url(images/countertop.gif)",
-							"left": "url(images/countertop.gif)",
-							"back": "url(images/countertop.gif)",
-							"right": "url(images/countertop.gif)",
-							"bottom": "url(images/countertop.gif)"
+							"top": "url(images/countertop3.gif)",
+							"left": "url(images/countertop3.gif)",
+							"back": "url(images/countertop3.gif)",
+							"right": "url(images/countertop3.gif)",
+							"bottom": "url(images/countertop3.gif)"
 						}
+					},
+					{
+						"objectClass": "desk",
+						"objectName": "Desk1",
+						"shape": "cuboid",
+						"moveable": false,
+						"dimensions": [4,1,1],
+						"origin": [7,15],
+						"skin": {
+							"top": "white",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						},
+						"contents": [
+							{
+								"objectClass": "imac",
+								"objectName": "Imac1",
+								"width": 1,
+								"origin": [0.5, 0.5],
+								"img": "images/imac.svg"
+							},
+							{
+								"objectClass": "imac",
+								"objectName": "Imac2",
+								"width": 1,
+								"origin": [2.5, 0.5],
+								"img": "images/imac.svg"
+							}
+						]
 					},
 					{
 						"objectClass": "plant",
@@ -190,7 +235,7 @@
 							"left": "none",
 							"back": "none",
 							"right": "none",
-							"bottom": "url(../images/plant.gif)"
+							"bottom": "url(images/plant.gif)"
 						}
 					},
 					{
@@ -210,9 +255,9 @@
 						}
 					},
 					{
-						"objectClass": "bad-stool",
-						"objectName": "Enemy1",
-						"value": 100,
+						"objectClass": "stool",
+						"objectName": "Stool2",
+						"value": -50,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.8,0.8,0.8],
@@ -227,12 +272,92 @@
 					},
 					{
 						"objectClass": "bad-stool",
-						"objectName": "Enemy2",
-						"value": 100,
+						"objectName": "Stool3",
+						"value": 200,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.8,0.8,0.8],
 						"origin": [13,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool4",
+						"value": 200,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [4,3],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool5",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [4,13],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "stool",
+						"objectName": "Stool6",
+						"value": -50,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [9,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool7",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [5,8],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool8",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [4,13],
 						"skin": {
 							"top": "none",
 							"left": "none",

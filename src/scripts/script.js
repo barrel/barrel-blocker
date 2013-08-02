@@ -256,7 +256,9 @@
 							}
 
 							$deco.css(styles);
-							$deco.append('<img src="'+decoration.img+'">');
+							if(decoration.img) {
+								$deco.append('<img src="'+decoration.img+'">');
+							}
 						});
 					}
 					
