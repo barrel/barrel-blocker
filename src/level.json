@@ -51,7 +51,16 @@
 						"origin": [0,20],
 						"axis": "x",
 						"length": 8,
-						"background": "url(images/brick3.gif)"
+						"background": "url(images/brick3.gif)",
+						"contents": [
+							{
+								"objectClass": "decoration",
+								"objectName": "poster",
+								"width": 1,
+								"origin": [4, 0.5],
+								"img": "images/poster1.gif"
+							}
+						]
 					},
 					{
 						"className": "window",
@@ -170,13 +179,60 @@
 						}
 					},
 					{
+						"objectClass": "plant",
+						"objectName": "Plant",
+						"shape": "cuboid",
+						"moveable": false,
+						"dimensions": [1,1,2],
+						"origin": [1,18],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "url(../images/plant.gif)"
+						}
+					},
+					{
 						"objectClass": "stool",
 						"objectName": "Stool1",
+						"value": -50,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [7,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Enemy1",
 						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
-						"dimensions": [0.75,0.75,0.75],
-						"origin": [7,10],
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [10,8],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Enemy2",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [11,13],
 						"skin": {
 							"top": "none",
 							"left": "none",

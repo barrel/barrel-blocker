@@ -1,3 +1,4 @@
+@import "fonts.less";
 @import "mixins.less";
 
 @grid: 100px;
@@ -29,7 +30,11 @@ body {
 	font-family: 'Helvetica Neue';
 	font-weight: 300;
 	
-	.just();
+	//.just();
+}
+
+#Time, #Score {
+	float: right;
 }
 
 #World{
@@ -292,11 +297,33 @@ body {
 			border-right: (@grid / 5) solid #c42298;
 		}
 		.face {
-			//background: #c42298 !important;
 			.pseudo-border((@grid / 5), #c42298);
 			&:after {
 				border-top: none;
 			}
+		}
+	}
+
+	&.bad-stool {
+		background-color: #7ed95b !important;
+		background-image: url(../images/bad_stool_face.gif) !important;
+		background-position: 50% 50% !important;
+		background-repeat: no-repeat !important;
+		&:after {
+			content: none;
+		}
+		.face {
+			.pseudo-border((@grid / 5), #7ed95b);
+			&:after {
+				border-top: none;
+			}
+		}
+	}
+
+	&.plant {
+		.face {
+			background-size: 100% !important;
+			background-repeat: no-repeat !important;
 		}
 	}
 }
@@ -347,6 +374,7 @@ body {
 	background: url(../images/clouds.gif);
 	background-size: 50% auto;
 	pointer-events: none;
+	z-index: -1;
 	.animation(panClouds 30s linear infinite);
 	&:before {
 		content: "";
