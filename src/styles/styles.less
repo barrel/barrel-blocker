@@ -64,6 +64,9 @@ body {
 }
 
 #World{
+	.gameover & {
+		pointer-events: none;
+	}
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -444,6 +447,8 @@ body {
 	&.show-logos {
 		.splash-logo {
 			.transform(none);
+			.filter(none);
+			opacity: 1;
 		}
 	}
 
@@ -451,8 +456,10 @@ body {
 		.fill-container;
 		background: #252528;
 		z-index: 100;
-		.transition(1s);
-		.transform(translateY(100%));
+		.transition(2s);
+		//.transform(translateY(100%));
+		.filter(blur(50px));
+		opacity: 0;
 	}
 
 	#WWWLogo {
@@ -575,5 +582,6 @@ body {
 		border-radius: 5px;
 		padding: 10px;
 		padding-bottom: 5px;
+		cursor: pointer;
 	}
 }
