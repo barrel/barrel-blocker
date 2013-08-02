@@ -21,7 +21,9 @@
 		},
 		sounds: {
 			src: {
-				music: '/audio/music.mp3' 
+				music: '/audio/music.mp3',
+				gameOver: '/audio/gameover.mp3',
+				timesUp: '/audio/timesup.mp3' 
 			},
 			audio: {}
 		},
@@ -791,6 +793,12 @@
 					
 					var delay = setTimeout(function(){
 						game.gameOver();
+						game.sounds.audio.music.pause();
+						game.sounds.audio.gameOver.addEventListener('pause', function(){
+							this.src = '';
+						});
+						game.sounds.audio.gameOver.play();
+						
 					},550);
 
 					return;
@@ -1234,6 +1242,8 @@
 				game.timer--;
 				if(game.timer == 0){
 					clearInterval(finalCountdown);
+					game.sounds.audio.music.pause();
+					game.sounds.audio.timesUp.play();
 					game.gameOver();
 				};
 				if(game.timer < 10){
@@ -1268,7 +1278,6 @@
 		
 		gameOver: function(){
 			$('body').addClass('gameover');
-			game.sounds.audio.music.pause();
 			$(window).unbind('keydown');
 			$('#GameOverModal').find('.score').text(game.score);
 			$('#Reset').click(function(){
