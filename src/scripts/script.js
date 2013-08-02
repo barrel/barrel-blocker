@@ -351,6 +351,7 @@
 						quad.origin[1] + room.origin[1]
 					];
 					
+				pos.z = -1;
 				quad.domNode = $floorTile[0];
 				
 				game.rooms[room.roomname].floor.push(quad);
