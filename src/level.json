@@ -212,10 +212,11 @@
 					{
 						"objectClass": "bad-stool",
 						"objectName": "Enemy1",
+						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.75,0.75,0.75],
-						"origin": [10,10],
+						"origin": [10,8],
 						"skin": {
 							"top": "none",
 							"left": "none",
@@ -227,6 +228,7 @@
 					{
 						"objectClass": "bad-stool",
 						"objectName": "Enemy2",
+						"value": 100,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.75,0.75,0.75],
