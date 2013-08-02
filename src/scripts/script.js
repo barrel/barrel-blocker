@@ -19,6 +19,12 @@
 			width: null,
 			height: null
 		},
+		sounds: {
+			src: {
+				music: '/audio/music.mp3' 
+			},
+			audio: {}
+		},
 		rooms: {},
 		camera: {
 			x: null,
@@ -569,7 +575,7 @@
 			
 			game.updated = new Date().getTime();
 			game.draw();
-			game.play();
+			game.initAudio();
 		},
 		
 		/*
@@ -1235,7 +1241,25 @@
 				};
 				
 			},1000);
+			
+			console.info(game)
 
+		},
+		
+		initAudio: function(){
+			$.each(game.sounds.src, function(key, value){
+				game.sounds.audio[key] = new Audio;
+				
+				if(key == 'music'){
+					game.sounds.audio[key].addEventListener('canplay', function(){
+						this.removeEventListener('canplay');
+						this.play();
+					});
+				}
+				game.sounds.audio[key].src = value;
+			})
+			
+			game.play();
 		},
 		
 		/* 
@@ -1244,6 +1268,7 @@
 		
 		gameOver: function(){
 			$('body').addClass('gameover');
+			game.sounds.audio.music.pause();
 			$(window).unbind('keydown');
 			$('#GameOverModal').find('.score').text(game.score);
 			$('#Reset').click(function(){
