@@ -232,7 +232,7 @@
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.8,0.8,0.8],
-						"origin": [11,13],
+						"origin": [13,10],
 						"skin": {
 							"top": "none",
 							"left": "none",
