@@ -306,7 +306,7 @@
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.5,0.5,0.5],
-						"origin": [7,1],
+						"origin": [7,1.5],
 						"skin": {
 							"top": "#F7468A",
 							"left": "#F7468A",
@@ -316,45 +316,6 @@
 						}
 					}
 				]
-			},
-			{
-				"roomname": "atrium",
-				"origin": [5,5],
-				"walls": [
-					{
-						"origin": [-2,0],
-						"axis": "y",
-						"length": 6,
-						"background": "white"
-					},
-					{
-						"origin": [-2,6],
-						"axis": "x",
-						"length": 3,
-						"background": "white"
-					},
-					{
-						"origin": [1,6],
-						"axis": "x",
-						"length": 2,
-						"background": "none"
-					},
-					{
-						"origin": [3,6],
-						"axis": "y",
-						"length": -6,
-						"background": "none"
-					},
-					{
-						"origin": [3,0],
-						"axis": "x",
-						"length": -5,
-						"background": "none"
-					}
-				],
-				"floor": {
-					"background" : "url(images/floor2.gif)"
-				}
 			}
 		],
 		"npcs": [
