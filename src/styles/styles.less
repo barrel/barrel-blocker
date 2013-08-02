@@ -115,6 +115,7 @@ body {
 	position: absolute;
 	left: 0;
 	bottom: 0;
+	background: blue;
 	
 	.transform-style(preserve-3d);
 
@@ -123,66 +124,68 @@ body {
 		.transform(translate3d(0,0,(@grid * 2)));
 		.transform-style(preserve-3d);
 		.transition(500ms);
-	}
 
-	.face {
-		position: absolute;
-		top: 0; left: 0;
-		width: 100%;
-		height: 200%;
-		&.x-plane {
-			top: auto; bottom: 0;
-			.transform-origin(50%, 100%);
-			.transform(rotateX(-90deg) translate3d(0,100%,0));
-			&.negative {
-				top: 0; left: 0;
-				.transform-origin(50%, 0%);
-				.transform(rotateX(90deg) translate3d(0,-100%,0));
-				.backface-visibility(visible);
+		.face {
+			position: absolute;
+			top: 0; left: 0;
+			width: 100%;
+			height: 200%;
+			&.x-plane {
+				top: auto; bottom: 0;
+				.transform-origin(50%, 100%);
+				.transform(rotateX(-90deg) translate3d(0,100%,0));
+				&.negative {
+					top: 0; left: 0;
+					.transform-origin(50%, 0%);
+					.transform(rotateX(90deg) translate3d(0,-100%,0));
+					.backface-visibility(visible);
+				}
 			}
-		}
-		&.y-plane {
-			.transform-origin(0%, 0%);
-			.transform(rotateX(-90deg) rotateY(-90deg));
-			&.negative {
-				.transform-origin(100%, 0%);
-				.transform(rotateX(-90deg) rotateY(90deg));
+			&.y-plane {
+				.transform-origin(0%, 0%);
+				.transform(rotateX(-90deg) rotateY(-90deg));
+				&.negative {
+					.transform-origin(100%, 0%);
+					.transform(rotateX(-90deg) rotateY(90deg));
+				}
 			}
 		}
 	}
 
 	&.player {
-		.face {
-			&.x-plane:not(.negative) {
-				.box-sizing(border-box);
-				border-bottom: @grid solid #557ffb;
-				&:before {
-					content: "";
-					.fill-container;
-					bottom: auto; height: (@grid * 4 / 10);
-					border: (@grid / 10) solid #332115;
-					border-bottom: none;
+		.avatar {
+			.face {
+				&.x-plane:not(.negative) {
+					.box-sizing(border-box);
+					border-bottom: @grid solid #557ffb;
+					&:before {
+						content: "";
+						.fill-container;
+						bottom: auto; height: (@grid * 4 / 10);
+						border: (@grid / 10) solid #332115;
+						border-bottom: none;
+					}
+				}
+				&.x-plane.negative {
+					.box-sizing(border-box);
+					border-bottom: @grid solid #332115;
+				}
+				&.y-plane {
+					.box-sizing(border-box);
+					border-top: @grid solid #332115;
 				}
 			}
-			&.x-plane.negative {
-				.box-sizing(border-box);
-				border-bottom: @grid solid #332115;
-			}
-			&.y-plane {
-				.box-sizing(border-box);
-				border-top: @grid solid #332115;
-			}
-		}
-		.eyes {
-			position: absolute;
-			background: black;
-			top: (@grid * 4 / 10); left: (@grid * 3 / 10);
-			width: (@grid * 4 / 10); height: (@grid / 10);
-			&:after {
-				content: "";
-				.fill-container;
-				left: (@grid / 10); right: (@grid / 10);
-				background-color: #f6b597;
+			.eyes {
+				position: absolute;
+				background: black;
+				top: (@grid * 4 / 10); left: (@grid * 3 / 10);
+				width: (@grid * 4 / 10); height: (@grid / 10);
+				&:after {
+					content: "";
+					.fill-container;
+					left: (@grid / 10); right: (@grid / 10);
+					background-color: #f6b597;
+				}
 			}
 		}
 	}

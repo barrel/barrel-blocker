@@ -175,7 +175,7 @@
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.5,0.5,0.5],
-						"origin": [7,1],
+						"origin": [7,10],
 						"skin": {
 							"top": "none",
 							"left": "none",
