@@ -665,7 +665,13 @@
 			if(controls.right)countKeys++;	
 			
 			if(countKeys > 1){
-				return;
+				controls = {
+					left: false,
+					right: false,
+					up: false,
+					down: false
+				};
+				controls[direction] = true;
 			};	
 			
 			// DROP MOVEABLE OBJECT IF SHUNTING AND DIRECTION REVERSES
@@ -677,8 +683,7 @@
 					game.dropMoveable(game.shunt.objectName, game.shunt.dir);
 					return false;
 				};
-			};
-				
+			};	
 			
 			if(controls.up && !controls.down){
 				dirY = 'up';
