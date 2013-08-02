@@ -1,3 +1,4 @@
+@import "fonts.less";
 @import "mixins.less";
 
 @grid: 100px;
@@ -29,7 +30,11 @@ body {
 	font-family: 'Helvetica Neue';
 	font-weight: 300;
 	
-	.just();
+	//.just();
+}
+
+#Time, #Score {
+	float: right;
 }
 
 #World{
@@ -314,6 +319,13 @@ body {
 			}
 		}
 	}
+
+	&.plant {
+		.face {
+			background-size: 100% !important;
+			background-repeat: no-repeat !important;
+		}
+	}
 }
 
 .desk {
@@ -362,6 +374,7 @@ body {
 	background: url(../images/clouds.gif);
 	background-size: 50% auto;
 	pointer-events: none;
+	z-index: -1;
 	.animation(panClouds 30s linear infinite);
 	&:before {
 		content: "";
