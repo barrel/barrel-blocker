@@ -224,9 +224,9 @@
 						}
 					},
 					{
-						"objectClass": "bad-stool",
-						"objectName": "Enemy1",
-						"value": 100,
+						"objectClass": "stool",
+						"objectName": "Stool2",
+						"value": -50,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.8,0.8,0.8],
@@ -241,12 +241,92 @@
 					},
 					{
 						"objectClass": "bad-stool",
-						"objectName": "Enemy2",
-						"value": 100,
+						"objectName": "Stool3",
+						"value": 200,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.8,0.8,0.8],
 						"origin": [13,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool4",
+						"value": 200,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [4,3],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool5",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [4,13],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "stool",
+						"objectName": "Stool6",
+						"value": -50,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [9,10],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool7",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [5,8],
+						"skin": {
+							"top": "none",
+							"left": "none",
+							"back": "none",
+							"right": "none",
+							"bottom": "none"
+						}
+					},
+					{
+						"objectClass": "bad-stool",
+						"objectName": "Stool8",
+						"value": 100,
+						"shape": "cuboid",
+						"moveable": true,
+						"dimensions": [0.8,0.8,0.8],
+						"origin": [4,13],
 						"skin": {
 							"top": "none",
 							"left": "none",
