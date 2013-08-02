@@ -9,6 +9,7 @@
 		levelData: null,
 		tile: 100,
 		speed: 2.5,
+		score: 0,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
@@ -148,10 +149,12 @@
 				// CREATE ROOM
 				
 				var room = this,
-					$room = $('<div class="room" id="'+room.roomname+'"/>').appendTo(game.$world),
+					roomClass = room.roomClass == 'pit' ? ' pit' : '',
+					$room = $('<div class="room'+roomClass+'" id="'+room.roomname+'"/>').appendTo(game.$world),
 					roomPos = {
 						x: game.tile * room.origin[0],
-						y: -(game.tile * room.origin[1])
+						y: -(game.tile * room.origin[1]),
+						z: room.roomClass == 'pit' ? 1 : 0
 					};
 					
 				// POSITION ROOM
@@ -164,7 +167,8 @@
 				game.rooms[room.roomname] = {
 					domNode: $room[0],
 					floor: [],
-					absOrigin: room.origin
+					absOrigin: room.origin,
+					pit: room.roomClass == 'pit' ? true : false
 				};
 				
 				// BUILD COLLISION OBJECT 
@@ -262,6 +266,7 @@
 					// MAP FLOOR TILES
 					
 					if(wall.axis == 'y' && !negative){
+
 						var currentTile = [
 								wall.origin[0],
 								wall.origin[1]
@@ -405,7 +410,9 @@
 							bb: {
 								width: furn.dimensions[0],
 								height: furn.dimensions[1]
-							}
+							},
+							height: furn.dimensions[2],
+							value: furn.value
 						}
 					};
 
@@ -754,6 +761,10 @@
 				game.currentRoom = game.detectRoom(game.characters.player);
 				game.$player.attr('data-room',game.currentRoom.roomname);
 				game.moveCharacter(game.characters.player);
+				
+				if(game.currentRoom.pit){
+					// GAME OVER!!
+				}
 			};
 
 			if(!collision.collided){
@@ -817,14 +828,14 @@
 						newTranslate = {
 							x: direction == 'right' ? game.characters.player.bb.width * game.tile : -game.moveables[collision.collidedWith].bb.width * game.tile,
 							y: -offset * game.tile,
-							z: 50
+							z: game.moveables[collision.collidedWith].height * game.tile
 						};
 					} else {
 						offset = game.shunt.collisionData.absOrigin[0] - game.characters.player.x;
 						newTranslate = {
 							x: offset * game.tile,
 							y: direction == 'up' ? -game.characters.player.bb.height * game.tile : game.moveables[collision.collidedWith].bb.height * game.tile,
-							z: 50
+							z: game.moveables[collision.collidedWith].height * game.tile
 						}
 					}
 						
@@ -871,6 +882,23 @@
 				(collisionObject.absOrigin[0] + distanceShunted.x).toFixed(1) * 1,
 				(collisionObject.absOrigin[1] + distanceShunted.y).toFixed(1) * 1
 			];
+			
+			// CHECK IF IN PIT
+			
+			moveableRoom = game.detectRoom({
+				x: collisionObject.absOrigin[0],
+				y: collisionObject.absOrigin[1]
+			});
+			
+			if(moveableRoom.pit){
+				game.score += moveable.value;
+				$moveable.remove();
+				delete game.moveables[objectName];
+				console.info(game.score)
+				return;
+			};
+			
+			// UPDATE COLLISION DATA
 			
 			for(i = 0; i < 4; i++){
 				var collideDir = 'left'
@@ -929,6 +957,7 @@
 			// UPDATE MOVEABLE ORIGIN
 			
 			moveable.origin = [newGridPos.x,newGridPos.y];
+		
 		
 		},
 
@@ -1108,10 +1137,10 @@
 			for(var i = 0; i < game.floorTiles.length; i++) {
 				floorTile = game.floorTiles[i];
 				if(
-					game.characters.player.x >= floorTile.xMin &&
-					game.characters.player.x <= floorTile.xMax &&
-					game.characters.player.y >= floorTile.yMin &&
-					game.characters.player.y <= floorTile.yMax
+					position.x >= floorTile.xMin &&
+					position.x <= floorTile.xMax &&
+					position.y >= floorTile.yMin &&
+					position.y <= floorTile.yMax
 				){
 					index = i;
 				}
@@ -1119,7 +1148,8 @@
 			
 			return {
 				roomname: game.floorTiles[index].parentRoom,
-				domNode: game.floorTiles[index].parentdomNode
+				domNode: game.floorTiles[index].parentdomNode,
+				pit: game.rooms[game.floorTiles[index].parentRoom].pit
 			};
 		},
 		
