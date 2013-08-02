@@ -61,10 +61,12 @@ body {
 }
 
 .wall{
-	.box-sizing(border-box);
+	//.box-sizing(border-box);
 	position: absolute;
 	left: 0;
 	bottom: 0;
+	border-left: 1px solid transparent;
+	border-right: 1px solid transparent;
 
 	.transform-origin(0%, 0%);
 	&:not(.backface){
@@ -106,7 +108,7 @@ body {
 	padding-top: 1px;
 	left: 0;
 	bottom: 0;
-	border-top: 1px solid transparent;
+	border: 1.5px solid transparent;
 }
 
 @playerRotateX: 90deg;
@@ -284,14 +286,14 @@ body {
 	}
 
 	&.stool {
-		.pseudo-border((@grid / 5), #c42298);
+		.pseudo-border((@grid / 4), #c42298);
 		&:after {
-			border-left: (@grid / 6) solid #c42298;
-			border-right: (@grid / 6) solid #c42298;
+			border-left: (@grid / 5) solid #c42298;
+			border-right: (@grid / 5) solid #c42298;
 		}
 		.face {
 			//background: #c42298 !important;
-			.pseudo-border((@grid / 10), #c42298);
+			.pseudo-border((@grid / 5), #c42298);
 			&:after {
 				border-top: none;
 			}
@@ -336,5 +338,37 @@ body {
 			bottom: 8px;
 			background: white;
 		}
+	}
+}
+
+#Clouds {
+	.fill-container;
+	overflow: visible;
+	background: url(../images/clouds.gif);
+	background-size: 50% auto;
+	pointer-events: none;
+	.animation(panClouds 30s linear infinite);
+	&:before {
+		content: "";
+		.fill-container;
+		right: 100%;
+		left: auto;
+		width: 100%;
+		background: inherit;
+		background-size: 50% auto;
+	}
+}
+
+@-webkit-keyframes panClouds { .pan-clouds-frames; }
+@-moz-keyframes panClouds { .pan-clouds-frames; }
+@-ms-keyframes panClouds { .pan-clouds-frames; }
+@-o-keyframes panClouds { .pan-clouds-frames; }
+@keyframes panClouds { .pan-clouds-frames; }
+.pan-clouds-frames() {
+	from {
+		.transform(none);
+	}
+	to {
+		.transform(translate3d(100%,0,0));
 	}
 }
