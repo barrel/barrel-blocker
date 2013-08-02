@@ -11,7 +11,7 @@
 		speed: 2.5,
 		score: 0,
 		dead: false,
-		timer: 10,
+		timer: 60,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
