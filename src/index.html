@@ -48,6 +48,9 @@
 
 	<script>
 		$(function() {
+
+			$('#BackButton').hide();
+
 			$('.section-link').click(function() {
 				var $this = $(this);
 				$('.splash-section.active').removeClass('active');
@@ -59,8 +62,19 @@
 					$('#BackButton').show();
 				}
 			});
-			
-			$('#BackButton').hide();
+
+			var hey = new Audio;
+
+			hey.addEventListener('canplay', function(){
+				var self = this;
+				this.removeEventListener('canplay');
+				setTimeout(function() {
+					self.play();
+				}, 250);
+			});
+
+			hey.src = 'audio/hey.mp3'
+
 			$('#SplashPage').removeClass('show-logos');
 		});
 	</script>
