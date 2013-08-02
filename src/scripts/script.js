@@ -11,6 +11,7 @@
 		speed: 2.5,
 		score: 0,
 		dead: false,
+		timer: 60,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
@@ -627,7 +628,10 @@
 
 				// UPDATE HUD
 
-				$('#Score').find('.value').text(game.score)
+				$('#Score').find('.value').text(game.score);
+				
+				var timeLeft = game.timer == 60 ? '1:00' : '0:'+game.timer; 
+				$('#Time').find('.value').text(timeLeft);
 
 				// GET FRAMERATE
 
@@ -780,7 +784,7 @@
 					};
 					
 					var delay = setTimeout(function(){
-						// GAME OVER
+						game.gameOver();
 					},550);
 
 					return;
@@ -1215,14 +1219,33 @@
 		/*
 		*	PLAY
 		*
-		*	Manages HUD, interactions, scoring etc
+		*	Manages Countdown
 		*/
 
 		play: function(){
 			
-			//alert('Welcome to Barrelblocker! - Use WASD to move.');
-			console.info(game);
+			var finalCountdown = setInterval(function(){
+				game.timer--;
+				if(game.timer == 0){
+					clearInterval(finalCountdown);
+					game.gameOver();
+				};
+				if(game.timer < 10){
+					game.timer = '0'+game.timer;
+				};
+				
+			},1000);
 
+		},
+		
+		/* 
+		*	GAME OVER
+		*/
+		
+		gameOver: function(){
+			$('body').addClass('gameover');
+			$(window).unbind('keydown');
+			$('#GameOverModal').find('.score').text(game.score);
 		},
 		
 		/*
