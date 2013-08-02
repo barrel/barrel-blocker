@@ -473,30 +473,31 @@
 			// RENDER AND PLACE NPCS
 
 			game.$npcs = [];
+			if(game.levelData.npcs) {
+				$.each(game.levelData.npcs, function(){
+					var $npc = $('<div class="char '+this.type+'"><div class="avatar"/></div>').appendTo(game.$world),
+						npc = {
+							type: this.type,
+							dir: 'down',
+							domNode: $npc[0],
+							x: this.startPos[0],
+							y: this.startPos[1],
+							moves: this.moves,
+							bb: game.characters.player.bb,
+							updated: new Date().getTime()
+						}
 
-			$.each(game.levelData.npcs, function(){
-				var $npc = $('<div class="char '+this.type+'"><div class="avatar"/></div>').appendTo(game.$world),
-					npc = {
-						type: this.type,
-						dir: 'down',
-						domNode: $npc[0],
-						x: this.startPos[0],
-						y: this.startPos[1],
-						moves: this.moves,
-						bb: game.characters.player.bb,
-						updated: new Date().getTime()
-					}
+					$npc.css({
+						width: (npc.bb.width * game.tile)+'px',
+						height: (npc.bb.height * game.tile)+'px'
+					});
 
-				$npc.css({
-					width: (npc.bb.width * game.tile)+'px',
-					height: (npc.bb.height * game.tile)+'px'
+					game.$npcs.push($npc);
+					game.characters.npcs.push(npc);
+
+					game.moveCharacter(npc);
 				});
-
-				game.$npcs.push($npc);
-				game.characters.npcs.push(npc);
-
-				game.moveCharacter(npc);
-			});
+			}
 			
 			game.bindControls();
 		},
