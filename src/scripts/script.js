@@ -177,9 +177,21 @@
 						negative = -wall.length > 0 ? true : false,
 						className = (negative ? ' negative' : '') + (wall.backfaceVisible ? ' backface' : '') + (wall.portal ? ' portal' : ''),
 						pxLength = negative ? -wall.length : wall.length,
-						$wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background: '+wall.background+'"/>').appendTo($room),
 						translate = {},
 						rotate = {};
+
+					if(wall.className) {
+						className += ' '+wall.className;
+					}	
+
+					var $wall = $('<div class="wall '+wall.axis+'-plane'+className+'" style="background: '+wall.background+'"/>').appendTo($room);
+
+					if(wall.isWindow) {
+						$wall.css({
+							'background-image': wall.background,
+							'background': 'none'
+						}).addClass('window');
+					}
 						
 					$wall.css({
 						width: game.tile * pxLength+'px',

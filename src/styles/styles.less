@@ -14,7 +14,7 @@ html, body {
 
 body {
 	.perspective-origin(50%, 0%);
-	background: #000;
+	background: #abeffe;
 }
 
 #HUD{
@@ -80,6 +80,23 @@ body {
 
 		img {
 			width: 100%;
+		}
+	}
+
+	&.window {
+		&:before, &:after {
+			content: "";
+			.fill-container;
+			left: -5px; right: -5px;
+			background-image: url(../images/brick3.gif);
+		}
+		&:before {
+			top: auto;
+			height: (@grid / 2);
+		}
+		&:after {
+			bottom: auto;
+			height: (@grid);
 		}
 	}
 }

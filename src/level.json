@@ -44,80 +44,104 @@
 					{
 						"origin": [0,6],
 						"axis": "y",
-						"length": 24,
+						"length": 14,
 						"background": "white"
 					},
 					{
-						"origin": [0,30],
+						"origin": [0,20],
 						"axis": "x",
-						"length": 15,
-						"background": "url(images/brick3.gif)",
-						"contents": [
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [5, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [8, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [11, 0.5],
-								"img": "images/window.svg"
-							}
-						]
+						"length": 8,
+						"background": "url(images/brick3.gif)"
 					},
 					{
-						"origin": [15,30],
+						"className": "window",
+						"origin": [8,20],
+						"axis": "x",
+						"length": 1
+					},
+					{
+						"origin": [9,20],
+						"axis": "x",
+						"length": 1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [10,20],
+						"axis": "x",
+						"length": 1
+					},
+					{
+						"origin": [11,20],
+						"axis": "x",
+						"length": 1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [12,20],
+						"axis": "x",
+						"length": 1
+					},
+					{
+						"origin": [13,20],
+						"axis": "x",
+						"length": 2,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"origin": [15,20],
 						"axis": "y",
-						"length": -30,
-						"background": "url(images/brick3.gif)",
-						"contents": [
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [3, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [6, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [9, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [12, 0.5],
-								"img": "images/window.svg"
-							},
-							{
-								"objectClass": "decoration",
-								"objectName": "window",
-								"width": 1.5,
-								"origin": [15, 0.5],
-								"img": "images/window.svg"
-							}
-						]
+						"length": -3,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,17],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,16],
+						"axis": "y",
+						"length": -1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,15],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,14],
+						"axis": "y",
+						"length": -1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,13],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,12],
+						"axis": "y",
+						"length": -1,
+						"background": "url(images/brick3.gif)"
+					},
+					{
+						"className": "window",
+						"origin": [15,11],
+						"axis": "y",
+						"length": -1
+					},
+					{
+						"origin": [15,10],
+						"axis": "y",
+						"length": -10,
+						"background": "url(images/brick3.gif)"
 					},
 					{
 						"origin": [15,0],
@@ -205,7 +229,7 @@
 		"npcs": [
 			{
 				"type": "coworker",
-				"startPos": [12.5, 26],
+				"startPos": [12.5, 10],
 				"moves": [
 					{
 						"dir": "down",
