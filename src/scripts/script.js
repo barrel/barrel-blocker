@@ -747,6 +747,7 @@
 				if(!collision.collided){
 					collision = game.detectCollision(collisionPos, dirY, game.characters.player.bb);
 				}
+				console.info(collision)
 			
 			} else {
 				game.$player.removeClass('walking');
@@ -894,6 +895,7 @@
 				game.score += moveable.value;
 				$moveable.remove();
 				delete game.moveables[objectName];
+				delete game.collisionObjects[objectName];
 				console.info(game.score)
 				return;
 			};

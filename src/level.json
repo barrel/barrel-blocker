@@ -196,7 +196,7 @@
 					{
 						"objectClass": "stool",
 						"objectName": "Stool1",
-						"value": 100,
+						"value": -50,
 						"shape": "cuboid",
 						"moveable": true,
 						"dimensions": [0.8,0.8,0.8],
