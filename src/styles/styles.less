@@ -30,17 +30,32 @@ body {
 	color: #666666;
 	font-weight: 300;
 
-	> * {
-		display: inline-block;
-		vertical-align: middle;
-		> * {
-			margin: 0;
+	.just();
+	
+	img{
+		margin-top: 25px;
+	}
+	
+	.info{
+		margin-top: 4px;
+		.just();
+	
+		.label{
+			display: inline-block;
+			vertical-align: middle;
+			margin: 0 10px 0 20px;
+		}
+		
+		.value{
+			font-size: 44px;
+			vertical-align: middle;
+			color: #fff;
 		}
 	}
 }
 
-#Time, #Score {
-	float: right;
+#Score .value{
+	color: #67c447 !important;
 }
 
 #World{
@@ -128,6 +143,10 @@ body {
 	position: absolute;
 	left: 0;
 	bottom: 0;
+	
+	&.dead{
+		.transition(all 500ms);
+	}
 	
 	.transform-style(preserve-3d);
 
@@ -272,7 +291,6 @@ body {
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	background: gold;
 	
 	.transform-style(preserve-3d);
 }
@@ -293,6 +311,10 @@ body {
 		img {
 			max-width: 100%;
 		}
+	}
+	
+	&.dead {
+		.transition(all 500ms);
 	}
 
 	&.stool {

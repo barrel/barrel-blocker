@@ -10,6 +10,7 @@
 		tile: 100,
 		speed: 2.5,
 		score: 0,
+		dead: false,
 		cameraSpeed: null,
 		framerate: 60,
 		actualFPS: null,
@@ -589,14 +590,16 @@
 
 				// REDRAW PLAYER
 
-				var playerTransform = game.getTransformCSS(game.$player.data('translate'));
-				var playerRotation = {
-					x: 0,
-					y: 0,
-					z: 0
-				}
+				if(!game.dead){
+					var playerTransform = game.getTransformCSS(game.$player.data('translate'));
+					var playerRotation = {
+						x: 0,
+						y: 0,
+						z: 0
+					}
 
-				game.$player.css(playerTransform);
+					game.$player.css(playerTransform);
+				};
 
 				// REDRAW NPCs
 
@@ -622,8 +625,7 @@
 
 				// UPDATE HUD
 
-				$('#RoomName').text(game.currentRoom.roomname);
-				//$('#FPS').text(game.actualFPS+'fps');
+				$('#Score').find('.value').text(game.score)
 
 				// GET FRAMERATE
 
@@ -746,8 +748,7 @@
 				collision = game.detectCollision(collisionPos, dirX, game.characters.player.bb);
 				if(!collision.collided){
 					collision = game.detectCollision(collisionPos, dirY, game.characters.player.bb);
-				}
-				console.info(collision)
+				};
 			
 			} else {
 				game.$player.removeClass('walking');
@@ -764,8 +765,24 @@
 				game.moveCharacter(game.characters.player);
 				
 				if(game.currentRoom.pit){
-					// GAME OVER!!
-				}
+					
+					game.dead = true;
+					game.$player.addClass('dead');
+					requestAnimationFrame(delay);
+					var playerTranslate = game.$player.data('translate');
+					$.extend(playerTranslate,{z: -300});
+					
+					function delay(){
+						playerTransform = game.getTransformCSS(playerTranslate);
+						game.$player.css(playerTransform);
+					};
+					
+					var delay = setTimeout(function(){
+						// GAME OVER
+					},550);
+
+					return;
+				};
 			};
 
 			if(!collision.collided){
@@ -884,22 +901,6 @@
 				(collisionObject.absOrigin[1] + distanceShunted.y).toFixed(1) * 1
 			];
 			
-			// CHECK IF IN PIT
-			
-			moveableRoom = game.detectRoom({
-				x: collisionObject.absOrigin[0],
-				y: collisionObject.absOrigin[1]
-			});
-			
-			if(moveableRoom.pit){
-				game.score += moveable.value;
-				$moveable.remove();
-				delete game.moveables[objectName];
-				delete game.collisionObjects[objectName];
-				console.info(game.score)
-				return;
-			};
-			
 			// UPDATE COLLISION DATA
 			
 			for(i = 0; i < 4; i++){
@@ -959,6 +960,39 @@
 			// UPDATE MOVEABLE ORIGIN
 			
 			moveable.origin = [newGridPos.x,newGridPos.y];
+			
+			// CHECK IF IN PIT
+			
+			moveableRoom = game.detectRoom({
+				x: collisionObject.absOrigin[0],
+				y: collisionObject.absOrigin[1]
+			});
+			
+			if(moveableRoom.pit){
+				game.score += moveable.value;
+				
+				delete game.moveables[objectName];
+				delete game.collisionObjects[objectName];
+				
+				
+				moveableTransform = game.getTransformCSS($moveable.data('translate'));
+				$moveable.css(moveableTransform);
+				
+				requestAnimationFrame(delay);
+				
+				function delay(){
+					$moveable.addClass('dead');
+					$.extend(moveableTranslate,{z: -100});
+					moveableTransform = game.getTransformCSS(moveableTranslate);
+					$moveable.css(moveableTransform);
+				};
+				
+				var delay = setTimeout(function(){
+					$moveable.remove();
+				},550);
+				
+				return;
+			};
 		
 		
 		},
