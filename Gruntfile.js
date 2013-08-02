@@ -82,7 +82,8 @@ module.exports = function(grunt) {
 					src: [
 						'*.{html,txt,htaccess,json,hbs}',
 						'**/*.{png,jpg,gif,svg,ico}',
-						'**/*.{eot,ttf,woff}'
+						'**/*.{eot,ttf,woff}',
+						'**/*.{mp3}'
 					]
 				}]
 			}
