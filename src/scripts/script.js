@@ -21,9 +21,9 @@
 		},
 		sounds: {
 			src: {
-				music: '/audio/music.mp3',
-				gameOver: '/audio/gameover.mp3',
-				timesUp: '/audio/timesup.mp3' 
+				music: 'audio/music.mp3',
+				gameOver: 'audio/gameover.mp3',
+				timesUp: 'audio/timesup.mp3' 
 			},
 			audio: {}
 		},
