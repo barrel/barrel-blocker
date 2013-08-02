@@ -45,7 +45,21 @@
 						"origin": [0,6],
 						"axis": "y",
 						"length": 14,
-						"background": "white"
+						"background": "white",
+						"contents": [
+							{
+								"objectClass": "decoration door",
+								"objectName": "WC1",
+								"width": 2,
+								"origin": [4,0]
+							},
+							{
+								"objectClass": "decoration door",
+								"objectName": "WC2",
+								"width": 2,
+								"origin": [9,0]
+							}
+						]
 					},
 					{
 						"origin": [0,20],
@@ -171,11 +185,11 @@
 						"dimensions": [6,1,1],
 						"origin": [5,2],
 						"skin": {
-							"top": "url(images/countertop.gif)",
-							"left": "url(images/countertop.gif)",
-							"back": "url(images/countertop.gif)",
-							"right": "url(images/countertop.gif)",
-							"bottom": "url(images/countertop.gif)"
+							"top": "url(images/countertop3.gif)",
+							"left": "url(images/countertop3.gif)",
+							"back": "url(images/countertop3.gif)",
+							"right": "url(images/countertop3.gif)",
+							"bottom": "url(images/countertop3.gif)"
 						}
 					},
 					{
@@ -190,7 +204,7 @@
 							"left": "none",
 							"back": "none",
 							"right": "none",
-							"bottom": "url(../images/plant.gif)"
+							"bottom": "url(images/plant.gif)"
 						}
 					},
 					{
