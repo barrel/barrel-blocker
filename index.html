@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+	<title>Barrel Blocker!</title>
+	<link rel="stylesheet" href="styles/styles.css" />
+	<script src="scripts/script.js"></script>
+</head>
+<body id="SplashPage" class="show-logos">
+	<div id="WWWLogo" class="splash-logo">
+		<img src="images/www.svg" alt="World Wide Walrus" />
+	</div>
+	<span id="BackButton" class="back-btn section-link" data-section-target="Title">Back</span>
+	<div id="Clouds"></div>
+	<div id="Title" class="splash-section active">
+		<img class="logo" src="images/barrelblocker_title.png" alt="Barrel Blocker" />
+		<div id="Begin"><a href="game.html">Click Here to Begin</a></div>
+		<ul class="options">
+			<li>
+				<span class="section-link" data-section-target="HowToPlay">How to Play</span>
+			</li>
+			<li>
+				<span class="section-link" data-section-target="Credits">Credits</span>
+			</li>
+		</ul>
+	</div>
+	<div id="HowToPlay" class="splash-section">
+		<p>A gang of monsters masquerading as green stools have invaded the Barrel office!</p>
+		<p>It is your duty as barrel blocker to keep out all unwanted visitors.</p>
+		<img src="images/intro-enemies.png" class="enemy-illo" />
+		<p>Your objective is to push as many monsters as you can through the hole in the floor in one minute.</p>
+		<p>Use the <img class="controls" src="images/keys.png" alt="W, A, S, &amp; D" /> keys to navigate.</p>
+	</div>
+	<div id="Credits" class="splash-section">
+		<img class="brl-logo" src="images/barrel-blocks.svg" alt="Barrel" />
+		<ul class="team">
+			<li>Catherine Chen</li>
+			<li>Lee Khleang</li>
+			<li>Patrick Kunka</li>
+			<li>Scott Polhemus</li>
+			<li>Jane Song</li>
+		</ul>
+		<span class="footer">Barrel Creative Days 2013</span>
+	</div>
+
+	<script>
+		$(function() {
+
+			$('#BackButton').hide();
+
+			$('.section-link').click(function() {
+				var $this = $(this);
+				$('.splash-section.active').removeClass('active');
+				$('#'+$this.data('section-target')).addClass('active');
+
+				if($('.splash-section.active').is('#Title')) {
+					$('#BackButton').hide();
+				} else {
+					$('#BackButton').show();
+				}
+			});
+
+			var hey = new Audio;
+
+			hey.addEventListener('canplay', function(){
+				var self = this;
+				this.removeEventListener('canplay');
+				setTimeout(function() {
+					self.play();
+				}, 250);
+			});
+
+			hey.src = 'audio/hey.mp3'
+
+			$('#SplashPage').removeClass('show-logos');
+		});
+	</script>
+</body>
+</html>
