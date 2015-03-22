@@ -17,6 +17,25 @@ body {
 	.perspective-origin(50%, 0%);
 	background: #abeffe;
 	font-family: 'Outage', sans-serif;
+
+	background-image: url(../images/clouds.gif);
+	background-size: 50% auto;
+
+	.animation(panClouds 30s linear infinite);
+}
+
+@-webkit-keyframes panClouds { .pan-clouds-frames; }
+@-moz-keyframes panClouds { .pan-clouds-frames; }
+@-ms-keyframes panClouds { .pan-clouds-frames; }
+@-o-keyframes panClouds { .pan-clouds-frames; }
+@keyframes panClouds { .pan-clouds-frames; }
+.pan-clouds-frames() {
+	from {
+		background-position: 0% 0%;
+	}
+	to {
+		background-position: 100% 0%;
+	}
 }
 
 #HUD{
@@ -405,39 +424,6 @@ body {
 			bottom: 8px;
 			background: white;
 		}
-	}
-}
-
-#Clouds {
-	.fill-container;
-	overflow: visible;
-	background: url(../images/clouds.gif);
-	background-size: 50% auto;
-	pointer-events: none;
-	z-index: -1;
-	.animation(panClouds 30s linear infinite);
-	&:before {
-		content: "";
-		.fill-container;
-		right: 100%;
-		left: auto;
-		width: 100%;
-		background: inherit;
-		background-size: 50% auto;
-	}
-}
-
-@-webkit-keyframes panClouds { .pan-clouds-frames; }
-@-moz-keyframes panClouds { .pan-clouds-frames; }
-@-ms-keyframes panClouds { .pan-clouds-frames; }
-@-o-keyframes panClouds { .pan-clouds-frames; }
-@keyframes panClouds { .pan-clouds-frames; }
-.pan-clouds-frames() {
-	from {
-		.transform(none);
-	}
-	to {
-		.transform(translate3d(100%,0,0));
 	}
 }
 
